@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Financeiro - Cliente</title>
+    <title>Dashboard Financeiro - Mapa de Exploração</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -16,13 +16,13 @@
         }
 
         :root {
-            --primary-navy: #1B3A4B;
-            --accent-teal: #0EA5A0;
-            --secondary-gold: #C9A84C;
             --dark-bg: #0F1419;
             --dark-card: #1A2332;
             --dark-border: #2A3F52;
             --text-light: #E8F0F3;
+            --accent-teal: #0EA5A0;
+            --success: #10b981;
+            --error: #ef4444;
         }
 
         body {
@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 1920px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -61,22 +61,10 @@
             font-size: 0.95rem;
         }
 
-        .header-controls {
+        .period-selector {
             display: flex;
             gap: 12px;
             align-items: center;
-        }
-
-        .period-selector {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .period-selector label {
-            font-weight: 500;
-            color: var(--text-light);
-            margin-right: 8px;
         }
 
         .period-selector select {
@@ -85,8 +73,6 @@
             background: transparent;
             color: var(--text-light);
             border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.9rem;
             cursor: pointer;
         }
 
@@ -101,30 +87,18 @@
             border-radius: 14px;
             padding: 16px;
             margin-bottom: 30px;
-            display: none;
-        }
-
-        .status-bar.active {
-            display: block;
-        }
-
-        .status-bar.success {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--accent-teal);
         }
 
         .status-text {
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        .status-bar.success .status-text {
             color: #10b981;
+            font-weight: 500;
         }
 
+        /* KPI CARDS */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -152,27 +126,191 @@
 
         .kpi-value {
             font-family: 'Montserrat', sans-serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-light);
         }
 
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 24px;
+        /* MAPA DE EXPLORAÇÃO */
+        .mapa-wrapper {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .mapa-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .mapa-section {
             margin-bottom: 40px;
         }
 
+        .mapa-section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--dark-border);
+        }
+
+        .mapa-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--dark-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mapa-row:hover {
+            background: rgba(14, 165, 160, 0.05);
+            padding-left: 10px;
+        }
+
+        .mapa-row.total {
+            background: rgba(14, 165, 160, 0.1);
+            font-weight: 700;
+            border-bottom: 2px solid var(--accent-teal);
+            cursor: default;
+        }
+
+        .mapa-row.result {
+            background: rgba(16, 185, 129, 0.1);
+            font-weight: 700;
+            border: 2px solid var(--success);
+            margin-top: 10px;
+        }
+
+        .mapa-row.result.negative {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--error);
+        }
+
+        .mapa-conta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .mapa-conta-num {
+            font-weight: 700;
+            color: var(--accent-teal);
+            min-width: 50px;
+        }
+
+        .mapa-conta-desc {
+            color: #a0b4c7;
+            font-size: 0.9rem;
+        }
+
+        .mapa-valor {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        /* MODAL DETALHES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--dark-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--dark-border);
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        .close {
+            color: var(--accent-teal);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close:hover {
+            color: var(--error);
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modal-table th {
+            background: rgba(14, 165, 160, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-teal);
+            border-bottom: 2px solid var(--dark-border);
+        }
+
+        .modal-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .modal-table tr:hover {
+            background: rgba(14, 165, 160, 0.05);
+        }
+
+        /* GRÁFICO */
         .chart-wrapper {
             background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
             border: 1px solid var(--dark-border);
             border-radius: 14px;
             padding: 24px;
-        }
-
-        .chart-wrapper.full-width {
-            grid-column: 1 / -1;
+            margin-bottom: 30px;
         }
 
         .chart-title {
@@ -185,51 +323,7 @@
 
         .chart-container {
             position: relative;
-            height: 350px;
-        }
-
-        .table-wrapper {
-            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
-            border: 1px solid var(--dark-border);
-            border-radius: 14px;
-            padding: 24px;
-            overflow-x: auto;
-            margin-bottom: 24px;
-        }
-
-        .table-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th {
-            background: rgba(14, 165, 160, 0.1);
-            padding: 16px;
-            text-align: left;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--accent-teal);
-            border-bottom: 2px solid var(--dark-border);
-            text-transform: uppercase;
-        }
-
-        table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--dark-border);
-            font-size: 0.95rem;
-        }
-
-        table tr:hover {
-            background: rgba(14, 165, 160, 0.05);
+            height: 300px;
         }
 
         .footer {
@@ -242,40 +336,20 @@
         }
 
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
             .header h1 {
                 font-size: 1.8rem;
             }
 
-            .kpi-grid {
-                grid-template-columns: 1fr;
+            .mapa-row {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
-            .charts-grid {
-                grid-template-columns: 1fr;
+            .mapa-valor {
+                align-self: flex-end;
+                width: 100%;
+                text-align: right;
             }
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            background: rgba(14, 165, 160, 0.1);
-            border: 2px dashed var(--accent-teal);
-            border-radius: 14px;
-            margin: 40px 0;
-        }
-
-        .no-data h2 {
-            color: var(--accent-teal);
-            margin-bottom: 10px;
-        }
-
-        .no-data p {
-            color: #a0b4c7;
         }
     </style>
 </head>
@@ -287,79 +361,137 @@
                 <h1>📊 Dashboard Financeiro</h1>
                 <p id="headerDate">Carregando dados...</p>
             </div>
-            <div class="header-controls">
-                <div class="period-selector">
-                    <label for="monthSelect">Mês:</label>
-                    <select id="monthSelect" onchange="filterByMonth()">
-                        <option value="">Todos os meses</option>
-                        <option value="2026-01">Janeiro 2026</option>
-                        <option value="2026-02">Fevereiro 2026</option>
-                        <option value="2026-03">Março 2026</option>
-                        <option value="2026-04">Abril 2026</option>
-                        <option value="2026-05">Maio 2026</option>
-                        <option value="2026-06">Junho 2026</option>
-                        <option value="2026-07">Julho 2026</option>
-                        <option value="2026-08">Agosto 2026</option>
-                        <option value="2026-09">Setembro 2026</option>
-                        <option value="2026-10">Outubro 2026</option>
-                        <option value="2026-11">Novembro 2026</option>
-                        <option value="2026-12">Dezembro 2026</option>
-                    </select>
-                </div>
+            <div class="period-selector">
+                <label for="monthSelect">Mês:</label>
+                <select id="monthSelect" onchange="filterByMonth()">
+                    <option value="">Todos os meses</option>
+                    <option value="2026-01">Janeiro 2026</option>
+                    <option value="2026-02">Fevereiro 2026</option>
+                    <option value="2026-03">Março 2026</option>
+                    <option value="2026-04">Abril 2026</option>
+                    <option value="2026-05">Maio 2026</option>
+                    <option value="2026-06">Junho 2026</option>
+                    <option value="2026-07">Julho 2026</option>
+                    <option value="2026-08">Agosto 2026</option>
+                    <option value="2026-09">Setembro 2026</option>
+                    <option value="2026-10">Outubro 2026</option>
+                    <option value="2026-11">Novembro 2026</option>
+                    <option value="2026-12">Dezembro 2026</option>
+                </select>
             </div>
         </div>
 
         <!-- STATUS -->
-        <div id="statusBar" class="status-bar">
-            <div class="status-text" id="statusText">⏳ Carregando dados...</div>
+        <div class="status-bar">
+            <div class="status-text" id="statusText">✅ Dados carregados</div>
         </div>
 
         <!-- KPI CARDS -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-label">Total Débitos</div>
-                <div class="kpi-value" id="totalDebito">€ 0</div>
+                <div class="kpi-label">Total Rendimentos</div>
+                <div class="kpi-value" id="totalRendimentos">€ 0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Total Créditos</div>
-                <div class="kpi-value" id="totalCredito">€ 0</div>
+                <div class="kpi-label">Total Gastos</div>
+                <div class="kpi-value" id="totalGastos">€ 0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Saldo Líquido</div>
-                <div class="kpi-value" id="totalSaldo">€ 0</div>
+                <div class="kpi-label">Resultado Operacional</div>
+                <div class="kpi-value" id="resultadoOperacional">€ 0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Movimentos</div>
-                <div class="kpi-value" id="totalMovimentos">0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Contas SNC</div>
-                <div class="kpi-value" id="totalContas">0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Terceiros</div>
-                <div class="kpi-value" id="totalTerceiros">0</div>
+                <div class="kpi-label">Margem %</div>
+                <div class="kpi-value" id="margem">0%</div>
             </div>
         </div>
 
-        <!-- GRÁFICOS -->
-        <div class="charts-grid">
-            <div class="chart-wrapper full-width">
-                <h3 class="chart-title">📈 Débitos vs Créditos por Mês</h3>
-                <div class="chart-container">
-                    <canvas id="debCreditChart"></canvas>
+        <!-- GRÁFICO -->
+        <div class="chart-wrapper">
+            <h3 class="chart-title">📈 Resultado Operacional por Mês</h3>
+            <div class="chart-container">
+                <canvas id="resultadoChart"></canvas>
+            </div>
+        </div>
+
+        <!-- MAPA DE EXPLORAÇÃO -->
+        <div class="mapa-wrapper">
+            <h2 class="mapa-title">📋 Mapa de Exploração</h2>
+
+            <!-- RENDIMENTOS -->
+            <div class="mapa-section">
+                <div class="mapa-section-title">RENDIMENTOS (Contas 7x)</div>
+                <div id="rendimentosSection"></div>
+                <div class="mapa-row total">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">TOTAL RENDIMENTOS</div>
+                    </div>
+                    <div class="mapa-valor" id="totalRendimentosRow">€ 0</div>
+                </div>
+            </div>
+
+            <!-- GASTOS -->
+            <div class="mapa-section">
+                <div class="mapa-section-title">GASTOS (Contas 6x)</div>
+                <div id="gastosSection"></div>
+                <div class="mapa-row total">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">TOTAL GASTOS</div>
+                    </div>
+                    <div class="mapa-valor" id="totalGastosRow">€ 0</div>
+                </div>
+            </div>
+
+            <!-- RESULTADO -->
+            <div class="mapa-section">
+                <div class="mapa-row result" id="resultadoRow">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">RESULTADO LÍQUIDO</div>
+                    </div>
+                    <div class="mapa-valor" id="resultadoValor">€ 0</div>
                 </div>
             </div>
         </div>
 
-        <!-- TABELAS -->
-        <div class="table-wrapper">
-            <h3 class="table-title">📊 Movimentos SNC</h3>
-            <table>
+        <!-- RESUMO POR CONTA -->
+        <div style="background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 30px;">
+            <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--text-light); margin-bottom: 20px;">📊 Resumo por Conta SNC</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: rgba(14, 165, 160, 0.1);">
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem;">Conta</th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem;">Descritivo</th>
+                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem;">Débito</th>
+                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem;">Crédito</th>
+                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem;">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contasTable">
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #a0b4c7;">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>📊 Dashboard Financeiro - Mapa de Exploração</p>
+            <p style="margin-top: 10px; color: #5a6d7a;" id="lastUpdateText">Aguardando dados...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DETALHES -->
+    <div id="detalheModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detalhes da Conta</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <table class="modal-table">
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Conta SNC</th>
                         <th>Descritivo</th>
                         <th>Débito</th>
                         <th>Crédito</th>
@@ -367,35 +499,9 @@
                         <th>Terceiro</th>
                     </tr>
                 </thead>
-                <tbody id="movimentosTable">
-                    <tr><td colspan="7" style="text-align: center; color: #a0b4c7;">Carregando...</td></tr>
+                <tbody id="modalTable">
                 </tbody>
             </table>
-        </div>
-
-        <div class="table-wrapper">
-            <h3 class="table-title">📋 Resumo por Conta SNC</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Conta</th>
-                        <th>Descritivo</th>
-                        <th>Débito Total</th>
-                        <th>Crédito Total</th>
-                        <th>Saldo</th>
-                        <th>Movimentos</th>
-                    </tr>
-                </thead>
-                <tbody id="contasTable">
-                    <tr><td colspan="6" style="text-align: center; color: #a0b4c7;">Carregando...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-            <p>📊 Dashboard Financeiro - Cliente</p>
-            <p style="margin-top: 10px; color: #5a6d7a;" id="lastUpdateText">Aguardando dados...</p>
         </div>
     </div>
 
@@ -404,34 +510,31 @@
         let filteredData = null;
         let chartInstance = null;
 
-        // ============ INICIALIZAÇÃO ============
+        const contasAgrupadores = {
+            '61': 'CMVMC', '62': 'Pessoal', '63': 'Serviços Externos', '64': 'Operacional',
+            '65': 'Depreciações', '66': 'Provisões', '67': 'Outros Gastos', '68': 'Gastos Financeiros',
+            '69': 'Impostos', '71': 'Vendas', '72': 'Serviços', '73': 'Outros Rendimentos',
+            '74': 'Rendimentos Financeiros', '75': 'Ganhos Não Operacionais', '76': 'Reversão de Provisões',
+            '77': 'Rendimentos Excepcionais', '78': 'Reversão de Depreciações', '79': 'Outros Rendimentos'
+        };
+
         window.addEventListener('load', init);
 
         function init() {
-            showStatus('⏳ Carregando dados...', 'active');
-            
             const data = localStorage.getItem('dashboardData');
-            
             if (!data) {
-                showStatus('⚠️ Nenhum dado carregado ainda...', 'active');
-                showNoData();
+                document.getElementById('statusText').textContent = '⚠️ Nenhum dado carregado...';
                 return;
             }
 
             try {
                 allData = JSON.parse(data);
                 filteredData = JSON.parse(JSON.stringify(allData));
-                showStatus('✅ Dados carregados com sucesso!', 'success');
                 updateLastUpdateTime();
                 renderDashboard();
             } catch (error) {
-                showStatus('❌ Erro ao carregar dados: ' + error.message, 'active');
-                showNoData();
+                document.getElementById('statusText').textContent = '❌ Erro: ' + error.message;
             }
-        }
-
-        function formatEuro(value) {
-            return '€ ' + value.toLocaleString('pt-PT', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         }
 
         function filterByMonth() {
@@ -440,11 +543,9 @@
             if (!allData) return;
 
             if (!month) {
-                // Mostrar todos
                 filteredData = JSON.parse(JSON.stringify(allData));
                 document.getElementById('headerDate').textContent = 'Todos os Dados';
             } else {
-                // Filtrar por mês
                 filteredData = {
                     movimentos: allData.movimentos.filter(m => m.data.startsWith(month)),
                     contas: {},
@@ -452,9 +553,7 @@
                     timestamp: allData.timestamp
                 };
 
-                // Recalcular agregações
                 filteredData.movimentos.forEach(mov => {
-                    // Por conta
                     if (!filteredData.contas[mov.conta]) {
                         filteredData.contas[mov.conta] = {
                             descritivo: mov.descritivo,
@@ -468,19 +567,6 @@
                     filteredData.contas[mov.conta].totalCredito += mov.credito;
                     filteredData.contas[mov.conta].totalSaldo += mov.saldo;
                     filteredData.contas[mov.conta].movimentos += 1;
-
-                    // Por terceiro
-                    if (mov.terceiro && mov.nif) {
-                        if (!filteredData.terceiros[mov.nif]) {
-                            filteredData.terceiros[mov.nif] = {
-                                nome: mov.terceiro,
-                                contas: new Set(),
-                                movimentos: 0
-                            };
-                        }
-                        filteredData.terceiros[mov.nif].contas.add(mov.conta);
-                        filteredData.terceiros[mov.nif].movimentos += 1;
-                    }
                 });
 
                 const monthName = new Date(month + '-01').toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
@@ -490,101 +576,157 @@
             renderDashboard();
         }
 
-        function calculateTotals() {
-            if (!filteredData || !filteredData.movimentos) {
-                return { debito: 0, credito: 0, saldo: 0, movimentos: 0, contas: 0, terceiros: 0 };
-            }
+        function formatEuro(value) {
+            return '€ ' + Math.abs(value).toLocaleString('pt-PT', { maximumFractionDigits: 0 });
+        }
 
-            const debito = filteredData.movimentos.reduce((sum, m) => sum + (m.debito || 0), 0);
-            const credito = filteredData.movimentos.reduce((sum, m) => sum + (m.credito || 0), 0);
-            const saldo = filteredData.movimentos.reduce((sum, m) => sum + (m.saldo || 0), 0);
-            const movimentos = filteredData.movimentos.length;
-            const contas = Object.keys(filteredData.contas || {}).length;
-            const terceiros = Object.keys(filteredData.terceiros || {}).length;
-
-            return { debito, credito, saldo, movimentos, contas, terceiros };
+        function formatEuroSigned(value) {
+            const sign = value < 0 ? '- ' : '';
+            return sign + formatEuro(value);
         }
 
         function renderDashboard() {
-            if (!filteredData) return;
+            let totalRendimentos = 0;
+            let totalGastos = 0;
 
-            // Atualizar KPIs
-            const { debito, credito, saldo, movimentos, contas, terceiros } = calculateTotals();
-            document.getElementById('totalDebito').textContent = formatEuro(debito);
-            document.getElementById('totalCredito').textContent = formatEuro(credito);
-            document.getElementById('totalSaldo').textContent = formatEuro(saldo);
-            document.getElementById('totalMovimentos').textContent = movimentos.toLocaleString('pt-PT');
-            document.getElementById('totalContas').textContent = contas;
-            document.getElementById('totalTerceiros').textContent = terceiros;
+            Object.entries(filteredData.contas || {}).forEach(([conta, dados]) => {
+                const conta1char = conta.substring(0, 1);
+                const valor = dados.totalDebito - dados.totalCredito;
 
-            // Atualizar tabelas
-            updateMovimentosTable();
+                if (conta1char === '7') {
+                    totalRendimentos += valor;
+                } else if (conta1char === '6') {
+                    totalGastos += valor;
+                }
+            });
+
+            const resultado = totalRendimentos - totalGastos;
+            const margem = totalRendimentos !== 0 ? ((resultado / totalRendimentos) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalRendimentos').textContent = formatEuro(totalRendimentos);
+            document.getElementById('totalGastos').textContent = formatEuro(totalGastos);
+            document.getElementById('resultadoOperacional').textContent = formatEuro(resultado);
+            document.getElementById('margem').textContent = margem + '%';
+
+            renderMapaExploacao(totalRendimentos, totalGastos, resultado);
             updateContasTable();
-
-            // Atualizar gráfico
             updateChart();
         }
 
-        function updateMovimentosTable() {
-            if (!filteredData || !filteredData.movimentos) return;
+        function renderMapaExploacao(totalRend, totalGast, resultado) {
+            let rendimentosHtml = '';
+            const rendimentosData = {};
 
-            let html = '';
-            filteredData.movimentos.slice(0, 50).forEach(mov => {
-                html += `<tr>
-                    <td>${mov.data}</td>
-                    <td><strong>${mov.conta}</strong></td>
-                    <td>${mov.descritivo}</td>
-                    <td style="color: #10b981;">${formatEuro(mov.debito)}</td>
-                    <td style="color: #fbbf24;">${formatEuro(mov.credito)}</td>
-                    <td>${formatEuro(mov.saldo)}</td>
-                    <td>${mov.terceiro}</td>
-                </tr>`;
+            Object.entries(filteredData.contas || {}).forEach(([conta, dados]) => {
+                if (conta.startsWith('7')) {
+                    const agrupador = conta.substring(0, 2);
+                    if (!rendimentosData[agrupador]) {
+                        rendimentosData[agrupador] = 0;
+                    }
+                    rendimentosData[agrupador] += (dados.totalDebito - dados.totalCredito);
+                }
             });
 
-            if (filteredData.movimentos.length > 50) {
-                html += `<tr><td colspan="7" style="text-align: center; color: #a0b4c7;">... e mais ${filteredData.movimentos.length - 50} movimentos</td></tr>`;
-            }
+            Object.keys(rendimentosData).sort().forEach(agrupador => {
+                const valor = rendimentosData[agrupador];
+                if (valor !== 0) {
+                    rendimentosHtml += `
+                        <div class="mapa-row" onclick="showDetalhes('${agrupador}')">
+                            <div class="mapa-conta">
+                                <div class="mapa-conta-num">${agrupador}</div>
+                                <div class="mapa-conta-desc">${contasAgrupadores[agrupador] || 'Conta'}</div>
+                            </div>
+                            <div class="mapa-valor">${formatEuro(valor)}</div>
+                        </div>
+                    `;
+                }
+            });
 
-            document.getElementById('movimentosTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center; color: #a0b4c7;">Sem movimentos</td></tr>';
+            document.getElementById('rendimentosSection').innerHTML = rendimentosHtml;
+            document.getElementById('totalRendimentosRow').textContent = formatEuro(totalRend);
+
+            let gastosHtml = '';
+            const gastosData = {};
+
+            Object.entries(filteredData.contas || {}).forEach(([conta, dados]) => {
+                if (conta.startsWith('6')) {
+                    const agrupador = conta.substring(0, 2);
+                    if (!gastosData[agrupador]) {
+                        gastosData[agrupador] = 0;
+                    }
+                    gastosData[agrupador] += (dados.totalDebito - dados.totalCredito);
+                }
+            });
+
+            Object.keys(gastosData).sort().forEach(agrupador => {
+                const valor = gastosData[agrupador];
+                if (valor !== 0) {
+                    gastosHtml += `
+                        <div class="mapa-row" onclick="showDetalhes('${agrupador}')">
+                            <div class="mapa-conta">
+                                <div class="mapa-conta-num">${agrupador}</div>
+                                <div class="mapa-conta-desc">${contasAgrupadores[agrupador] || 'Conta'}</div>
+                            </div>
+                            <div class="mapa-valor">${formatEuro(valor)}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('gastosSection').innerHTML = gastosHtml;
+            document.getElementById('totalGastosRow').textContent = formatEuro(totalGast);
+
+            const resultRow = document.getElementById('resultadoRow');
+            if (resultado < 0) {
+                resultRow.classList.add('negative');
+            } else {
+                resultRow.classList.remove('negative');
+            }
+            document.getElementById('resultadoValor').textContent = formatEuroSigned(resultado);
         }
 
         function updateContasTable() {
-            if (!filteredData || !filteredData.contas) return;
-
             let html = '';
-            Object.entries(filteredData.contas).forEach(([conta, dados]) => {
+            const contas = Object.entries(filteredData.contas || {})
+                .sort((a, b) => a[0].localeCompare(b[0]));
+
+            contas.forEach(([conta, dados]) => {
                 html += `<tr>
-                    <td><strong>${conta}</strong></td>
-                    <td>${dados.descritivo}</td>
-                    <td style="color: #10b981;">${formatEuro(dados.totalDebito)}</td>
-                    <td style="color: #fbbf24;">${formatEuro(dados.totalCredito)}</td>
-                    <td>${formatEuro(dados.totalSaldo)}</td>
-                    <td>${dados.movimentos}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--dark-border);"><strong>${conta}</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--dark-border);">${dados.descritivo}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--dark-border); text-align: right; color: #10b981;">${formatEuro(dados.totalDebito)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--dark-border); text-align: right; color: #fbbf24;">${formatEuro(dados.totalCredito)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--dark-border); text-align: right;">${formatEuro(dados.totalSaldo)}</td>
                 </tr>`;
             });
 
-            document.getElementById('contasTable').innerHTML = html || '<tr><td colspan="6" style="text-align: center; color: #a0b4c7;">Sem dados</td></tr>';
+            document.getElementById('contasTable').innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 20px;">Sem dados</td></tr>';
         }
 
         function updateChart() {
             if (!allData || !allData.movimentos) return;
 
-            // Agrupar por mês
             const months = {};
             allData.movimentos.forEach(mov => {
-                const month = mov.data.substring(0, 7); // YYYY-MM
+                const month = mov.data.substring(0, 7);
                 if (!months[month]) {
-                    months[month] = { debito: 0, credito: 0 };
+                    months[month] = { rendimentos: 0, gastos: 0 };
                 }
-                months[month].debito += mov.debito;
-                months[month].credito += mov.credito;
+
+                const conta1char = mov.conta.substring(0, 1);
+                const valor = mov.debito - mov.credito;
+
+                if (conta1char === '7') {
+                    months[month].rendimentos += valor;
+                } else if (conta1char === '6') {
+                    months[month].gastos += valor;
+                }
             });
 
             const sortedMonths = Object.keys(months).sort();
-            const debitoData = sortedMonths.map(m => months[m].debito);
-            const creditoData = sortedMonths.map(m => months[m].credito);
+            const resultados = sortedMonths.map(m => months[m].rendimentos - months[m].gastos);
 
-            const ctx = document.getElementById('debCreditChart').getContext('2d');
+            const ctx = document.getElementById('resultadoChart').getContext('2d');
             
             if (chartInstance) chartInstance.destroy();
 
@@ -592,33 +734,21 @@
                 type: 'bar',
                 data: {
                     labels: sortedMonths,
-                    datasets: [
-                        {
-                            label: 'Débitos',
-                            data: debitoData,
-                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                            borderColor: '#10b981',
-                            borderWidth: 2
-                        },
-                        {
-                            label: 'Créditos',
-                            data: creditoData,
-                            backgroundColor: 'rgba(251, 191, 36, 0.8)',
-                            borderColor: '#fbbf24',
-                            borderWidth: 2
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Resultado Operacional',
+                        data: resultados,
+                        backgroundColor: resultados.map(r => r >= 0 ? '#10b981' : '#ef4444'),
+                        borderColor: resultados.map(r => r >= 0 ? '#059669' : '#dc2626'),
+                        borderWidth: 2
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    indexAxis: 'x',
                     plugins: {
                         legend: {
-                            labels: {
-                                font: { family: "'DM Sans', sans-serif", size: 12 },
-                                color: '#E8F0F3',
-                                padding: 20
-                            }
+                            labels: { color: '#E8F0F3', font: { size: 12 } }
                         }
                     },
                     scales: {
@@ -635,11 +765,37 @@
             });
         }
 
-        function showStatus(message, type) {
-            const statusBar = document.getElementById('statusBar');
-            statusBar.className = `status-bar ${type}`;
-            document.getElementById('statusText').textContent = message;
+        function showDetalhes(agrupador) {
+            const movimentos = (filteredData.movimentos || []).filter(m => m.conta.startsWith(agrupador));
+            
+            document.getElementById('modalTitle').textContent = `Detalhes - Conta ${agrupador} (${contasAgrupadores[agrupador]})`;
+
+            let html = '';
+            movimentos.forEach(mov => {
+                html += `<tr>
+                    <td>${mov.data}</td>
+                    <td>${mov.descritivo}</td>
+                    <td style="color: #10b981;">${formatEuro(mov.debito)}</td>
+                    <td style="color: #fbbf24;">${formatEuro(mov.credito)}</td>
+                    <td>${formatEuro(mov.saldo)}</td>
+                    <td>${mov.terceiro}</td>
+                </tr>`;
+            });
+
+            document.getElementById('modalTable').innerHTML = html;
+            document.getElementById('detalheModal').style.display = 'block';
         }
+
+        function closeModal() {
+            document.getElementById('detalheModal').style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            const modal = document.getElementById('detalheModal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
 
         function updateLastUpdateTime() {
             const lastUpdate = localStorage.getItem('lastUpdate');
@@ -648,17 +804,6 @@
             }
         }
 
-        function showNoData() {
-            const movTable = document.getElementById('movimentosTable');
-            const contTable = document.getElementById('contasTable');
-            
-            const noDataHtml = `<tr><td colspan="100%" style="padding: 0;"><div class="no-data"><h2>⚠️ Sem Dados</h2><p>O administrador ainda não carregou dados. Aguarde...</p></div></td></tr>`;
-            
-            movTable.innerHTML = noDataHtml;
-            contTable.innerHTML = noDataHtml;
-        }
-
-        // Recarregar dados a cada 10 segundos
         setInterval(() => {
             const data = localStorage.getItem('dashboardData');
             if (data) {
