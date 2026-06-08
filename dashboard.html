@@ -200,6 +200,23 @@
         let allData = null;
         let filteredData = null;
         let chartInstance = null;
+        let contasSNC = {}; // Mapeamento de contas SNC
+
+        // Carregar mapeamento de contas SNC
+        fetch('/contas_snc.json')
+            .then(response => response.json())
+            .then(data => {
+                contasSNC = data;
+            })
+            .catch(error => console.log('Aviso: Ficheiro de contas SNC não encontrado'));
+
+        function getDescritivoSNC(conta) {
+            // Primeiro tenta o mapeamento SNC, depois usa o do Excel
+            if (contasSNC[conta]) {
+                return contasSNC[conta];
+            }
+            return conta; // Fallback
+        }
 
         function formatEuro(value) {
             return '€ ' + value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -312,7 +329,7 @@
 
             Object.keys(rendimentosData).sort().forEach(agrupador => {
                 const valor = rendimentosData[agrupador].valor;
-                const descritivo = rendimentosData[agrupador].descritivo;
+                const descritivo = getDescritivoSNC(agrupador) || rendimentosData[agrupador].descritivo;
                 if (valor !== 0) {
                     rendimentosHtml += `<div class="mapa-row" onclick="showDetalhes('${agrupador}')"><div class="mapa-conta"><div class="mapa-conta-num">${agrupador}</div><div class="mapa-conta-desc">${descritivo}</div></div><div class="mapa-valor">${formatEuro(valor)}</div></div>`;
                 }
@@ -337,7 +354,7 @@
 
             Object.keys(gastosData).sort().forEach(agrupador => {
                 const valor = gastosData[agrupador].valor;
-                const descritivo = gastosData[agrupador].descritivo;
+                const descritivo = getDescritivoSNC(agrupador) || gastosData[agrupador].descritivo;
                 if (valor !== 0) {
                     gastosHtml += `<div class="mapa-row" onclick="showDetalhes('${agrupador}')"><div class="mapa-conta"><div class="mapa-conta-num">${agrupador}</div><div class="mapa-conta-desc">${descritivo}</div></div><div class="mapa-valor">${formatEuro(valor)}</div></div>`;
                 }
@@ -361,9 +378,9 @@
 
             contas.forEach(([conta, dados]) => {
                 const conta1char = conta.substring(0, 1);
-                // Inverter sinal para classe 7 na tabela também
                 const valorExibir = conta1char === '7' ? Math.abs(dados.totalMovimento) : dados.totalMovimento;
-                html += `<tr><td><strong>${conta}</strong></td><td>${dados.descritivo}</td><td>${formatEuro(valorExibir)}</td></tr>`;
+                const descritivo = getDescritivoSNC(conta) || dados.descritivo;
+                html += `<tr><td><strong>${conta}</strong></td><td>${descritivo}</td><td>${formatEuro(valorExibir)}</td></tr>`;
             });
 
             document.getElementById('contasTable').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px;">Sem dados</td></tr>';
