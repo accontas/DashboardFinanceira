@@ -6,7 +6,19 @@
     <title>Admin Dashboard - Parser SNC</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://unpkg.com/xlsx@latest/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        // Aguardar que XLSX carregue
+        function waitForXLSX() {
+            if (typeof XLSX === 'undefined') {
+                setTimeout(waitForXLSX, 100);
+            } else {
+                console.log('✅ XLSX carregado com sucesso');
+            }
+        }
+        waitForXLSX();
+    </script>
     
     <style>
         * {
@@ -347,6 +359,12 @@
 
         function handleFile(file) {
             showStatus('⏳ Processando XLSX...', 'info');
+
+            // Aguardar que XLSX esteja disponível
+            if (typeof XLSX === 'undefined') {
+                showStatus('❌ Erro: Biblioteca XLSX ainda está a carregar. Tente novamente em 2 segundos.', 'error');
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = (e) => {
