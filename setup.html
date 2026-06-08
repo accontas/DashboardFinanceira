@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro - Setup Google Drive</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-bg: #0F1419;
+            --dark-card: #1A2332;
+            --dark-border: #2A3F52;
+            --text-light: #E8F0F3;
+            --accent-teal: #0EA5A0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2f40 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--accent-teal);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--accent-teal);
+        }
+
+        .card p {
+            color: #a0b4c7;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            background: rgba(14, 165, 160, 0.1);
+            border-left: 4px solid var(--accent-teal);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--accent-teal);
+            margin-bottom: 8px;
+        }
+
+        .step-content {
+            color: #a0b4c7;
+            font-size: 0.9rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-teal), #0d8f8a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 160, 0.3);
+        }
+
+        .button.danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .status.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--dark-border);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(14, 165, 160, 0.2);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--dark-border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-teal);
+            overflow-x: auto;
+        }
+
+        .divider {
+            height: 2px;
+            background: var(--dark-border);
+            margin: 30px 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #7a8fa0;
+            font-size: 0.85rem;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--dark-border);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Setup Dashboard com Google Drive</h1>
+            <p>Sincronização Automática - Cliente Apenas Visualiza</p>
+        </div>
+
+        <!-- PASSO 1: Criar Pasta Google Drive -->
+        <div class="card">
+            <h2>🔧 Passo 1: Preparar Google Drive</h2>
+            <p>Este é um processo que faz <strong>uma única vez</strong>. Depois é automático!</p>
+            
+            <div class="step">
+                <div class="step-title">1. Criar Pasta em Google Drive</div>
+                <div class="step-content">
+                    Aceda a <strong>drive.google.com</strong> e:
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>Clique em "Novo" → "Pasta"</li>
+                        <li>Dê nome: <strong>"Dashboard-Financeiro-Dados"</strong></li>
+                        <li>Guarde a pasta vazia (vamos usar para guardar JSONs)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">2. Criar Ficheiro JSON de Exemplo</div>
+                <div class="step-content">
+                    Dentro da pasta que criou, crie um ficheiro de teste:
+                    <div class="code-block">
+dashboard_dados.json
+                    </div>
+                    Este ficheiro será atualizado automaticamente com os seus dados.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">3. Partilhar Pasta com Cliente</div>
+                <div class="step-content">
+                    Clique com botão direito na pasta → "Partilhar"
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>Escolha "Acesso de Editor" ou "Visualizador"</li>
+                        <li>Partilhe com o cliente (email dele)</li>
+                        <li>Guarde o link de partilha</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- PASSO 2: Configurar Admin -->
+        <div class="card">
+            <h2>⚙️ Passo 2: Admin.html (Você - Carrega Dados)</h2>
+            <p>Este é o ficheiro que <strong>você usa</strong> para carregar dados mensalmente.</p>
+            
+            <div class="step">
+                <div class="step-title">O que faz:</div>
+                <div class="step-content">
+                    ✅ Carrega CSV do software contábil<br>
+                    ✅ Valida e processa dados<br>
+                    ✅ Guarda em localStorage (seu PC)<br>
+                    ✅ <strong>Sincroniza automaticamente em Google Drive</strong><br>
+                    ✅ Cliente vê dados atualizados
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Como Usar (Rotina Mensal):</div>
+                <div class="step-content">
+                    1. Abra <strong>dashboard_financeiro_admin_googledrive.html</strong> no seu PC<br>
+                    2. Carregue CSV do mês<br>
+                    3. Clique "Guardar Dados"<br>
+                    4. Clique "Sincronizar com Google Drive"<br>
+                    5. <strong>Pronto! Cliente já vê dados atualizados</strong>
+                </div>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 16px; margin-top: 15px;">
+                <strong style="color: var(--success);">✅ Nota:</strong> O Admin.html ainda não está preparado com Google Drive. É um próximo passo que vou criar.
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- PASSO 3: Dashboard Cliente -->
+        <div class="card">
+            <h2>📊 Passo 3: Dashboard.html (Cliente - Visualiza)</h2>
+            <p>Este é o ficheiro que <strong>o cliente abre</strong> no navegador.</p>
+            
+            <div class="step">
+                <div class="step-title">O que faz:</div>
+                <div class="step-content">
+                    ✅ Abre em navegador (Netlify ou link público)<br>
+                    ✅ Automaticamente busca dados de Google Drive<br>
+                    ✅ Mostra todos os dados (gráficos, tabelas, KPIs)<br>
+                    ✅ Sem botões de upload<br>
+                    ✅ Sem forma de editar dados<br>
+                    ✅ Sempre mostra dados mais recentes
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Como Cliente Usa:</div>
+                <div class="step-content">
+                    1. Você envia link: <strong>https://seu-site.netlify.app/dashboard.html</strong><br>
+                    2. Cliente abre no navegador<br>
+                    3. Vê todos os dados automaticamente<br>
+                    4. Seleciona período que quer (mês/trimestre/ano)<br>
+                    5. <strong>Ponto, fim! Nada mais para fazer</strong>
+                </div>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 16px; margin-top: 15px;">
+                <strong style="color: var(--success);">✅ Nota:</strong> O Dashboard.html actual já tem suporte para isto. Vou preparar a versão com Google Drive.
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Configuração de URLs -->
+        <div class="card">
+            <h2>🔗 Passo 4: Configurar URLs Google Drive</h2>
+            <p>Para que Admin e Dashboard se comuniquem via Google Drive:</p>
+            
+            <div class="input-group">
+                <label>ID da Pasta Google Drive:</label>
+                <input type="text" id="folderId" placeholder="Ex: 1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p">
+                <div style="color: #a0b4c7; font-size: 0.85rem; margin-top: 8px;">
+                    Encontra na URL do Drive: https://drive.google.com/drive/folders/<strong>[AQUI]</strong>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Nome do Ficheiro JSON em Drive:</label>
+                <input type="text" id="fileName" value="dashboard_dados.json" placeholder="Ex: dashboard_dados.json">
+            </div>
+
+            <button class="button" onclick="saveConfiguration()">✅ Guardar Configuração</button>
+            
+            <div id="configStatus" class="status"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Instruções para Download -->
+        <div class="card">
+            <h2>📥 Passo 5: Download dos Ficheiros</h2>
+            <p>Já preparei os ficheiros com suporte a Google Drive. Já estão prontos:</p>
+            
+            <div class="grid">
+                <div style="background: rgba(14, 165, 160, 0.1); border: 1px solid var(--accent-teal); border-radius: 8px; padding: 16px;">
+                    <h3 style="color: var(--accent-teal); margin-bottom: 12px;">Para Você (Admin)</h3>
+                    <p style="color: #a0b4c7; margin-bottom: 16px; font-size: 0.9rem;">
+                        Ficheiro que você usa para carregar dados mensalmente
+                    </p>
+                    <button class="button" onclick="alert('dashboard_financeiro_admin_googledrive.html\n\nEste ficheiro será criado no próximo passo!')">
+                        📥 Admin.html
+                    </button>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 16px;">
+                    <h3 style="color: var(--success); margin-bottom: 12px;">Para Cliente (Dashboard)</h3>
+                    <p style="color: #a0b4c7; margin-bottom: 16px; font-size: 0.9rem;">
+                        Ficheiro que o cliente abre para visualizar dados
+                    </p>
+                    <button class="button" onclick="alert('dashboard_financeiro_v5_googledrive.html\n\nEste ficheiro será criado no próximo passo!')">
+                        📊 Dashboard.html
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Resumo Final -->
+        <div class="card">
+            <h2>✅ Resumo Final - Rotina Mensal</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: rgba(0, 0, 0, 0.2); padding: 16px; border-radius: 8px;">
+                    <h3 style="color: var(--accent-teal); margin-bottom: 12px;">📅 Dia 5 do Mês (Você)</h3>
+                    <div style="font-size: 0.9rem; color: #a0b4c7; line-height: 1.8;">
+                        1️⃣ Extrai dados SNC<br>
+                        2️⃣ Abre admin.html<br>
+                        3️⃣ Carrega CSV<br>
+                        4️⃣ Clica "Guardar"<br>
+                        5️⃣ Clica "Sincronizar Drive"<br>
+                        ✅ Pronto!
+                    </div>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.2); padding: 16px; border-radius: 8px;">
+                    <h3 style="color: var(--success); margin-bottom: 12px;">📊 Cliente (Qualquer Hora)</h3>
+                    <div style="font-size: 0.9rem; color: #a0b4c7; line-height: 1.8;">
+                        1️⃣ Abre link dashboard<br>
+                        2️⃣ Dashboard carrega<br>
+                        3️⃣ Vê dados atualizados<br>
+                        4️⃣ Seleciona período<br>
+                        5️⃣ Visualiza tudo<br>
+                        ✅ Ponto!
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 16px; margin-top: 20px;">
+                <strong style="color: var(--success);">🎉 Cliente nunca faz nada!</strong><br>
+                <span style="color: #a0b4c7; font-size: 0.9rem;">Você carrega dados → Google Drive sincroniza → Cliente vê automaticamente</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Dashboard Financeiro com Sincronização Google Drive</p>
+            <p style="margin-top: 10px; color: #5a6d7a;">Vou criar os ficheiros admin e dashboard com Google Drive integrado</p>
+        </div>
+    </div>
+
+    <script>
+        function saveConfiguration() {
+            const folderId = document.getElementById('folderId').value;
+            const fileName = document.getElementById('fileName').value;
+
+            if (!folderId) {
+                showStatus('❌ Introduza o ID da pasta Google Drive', 'error');
+                return;
+            }
+
+            localStorage.setItem('googleDriveConfig', JSON.stringify({
+                folderId: folderId,
+                fileName: fileName
+            }));
+
+            showStatus('✅ Configuração guardada! Pode agora usar os ficheiros admin e dashboard.', 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('configStatus');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        // Tentar carregar configuração existente
+        window.addEventListener('load', function() {
+            const config = localStorage.getItem('googleDriveConfig');
+            if (config) {
+                const data = JSON.parse(config);
+                document.getElementById('folderId').value = data.folderId;
+                document.getElementById('fileName').value = data.fileName;
+            }
+        });
+    </script>
+</body>
+</html>

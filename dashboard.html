@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro - Cliente</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-navy: #1B3A4B;
+            --accent-teal: #0EA5A0;
+            --secondary-gold: #C9A84C;
+            --dark-bg: #0F1419;
+            --dark-card: #1A2332;
+            --dark-border: #2A3F52;
+            --text-light: #E8F0F3;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2f40 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* HEADER -->
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--dark-border);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-content h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .header-content p {
+            color: var(--accent-teal);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .period-selector label {
+            font-weight: 500;
+            color: var(--text-light);
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+
+        .period-selector select {
+            padding: 10px 16px;
+            border: 2px solid var(--dark-border);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-selector select:hover {
+            border-color: var(--accent-teal);
+        }
+
+        .period-selector select:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(14, 165, 160, 0.2);
+        }
+
+        /* STATUS BAR -->
+        .status-bar {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .status-bar.active {
+            display: block;
+        }
+
+        .status-bar.loading {
+            border-color: var(--accent-teal);
+            background: rgba(14, 165, 160, 0.1);
+        }
+
+        .status-bar.success {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .status-bar.error {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .status-bar.loading .status-text {
+            color: var(--accent-teal);
+        }
+
+        .status-bar.success .status-text {
+            color: #10b981;
+        }
+
+        .status-bar.error .status-text {
+            color: #ef4444;
+        }
+
+        /* KPI CARDS -->
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(14, 165, 160, 0.1) 0%, transparent 70%);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-teal);
+            box-shadow: 0 10px 30px rgba(14, 165, 160, 0.15);
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #a0b4c7;
+            font-weight: 500;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .kpi-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            z-index: 1;
+            position: relative;
+        }
+
+        /* CHARTS -->
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-wrapper {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .chart-wrapper.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        /* TABLES -->
+        .table-wrapper {
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 24px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        .table-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: rgba(14, 165, 160, 0.1);
+            padding: 16px;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--accent-teal);
+            border-bottom: 2px solid var(--dark-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: 0.95rem;
+        }
+
+        table tr:hover {
+            background: rgba(14, 165, 160, 0.05);
+        }
+
+        .value-positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        /* FOOTER -->
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #7a8fa0;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--dark-border);
+            margin-top: 40px;
+        }
+
+        /* RESPONSIVE -->
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-controls {
+                width: 100%;
+                flex-direction: column;
+            }
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            background: rgba(14, 165, 160, 0.1);
+            border: 2px dashed var(--accent-teal);
+            border-radius: 14px;
+            margin: 40px 0;
+        }
+
+        .no-data-message h2 {
+            color: var(--accent-teal);
+            margin-bottom: 10px;
+        }
+
+        .no-data-message p {
+            color: #a0b4c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-content">
+                <h1>📊 Dashboard Financeiro</h1>
+                <p id="headerDate">Carregando dados...</p>
+            </div>
+            <div class="header-controls">
+                <div class="period-selector">
+                    <label for="periodSelect">Período:</label>
+                    <select id="periodSelect" onchange="changePeriod(this.value)">
+                        <optgroup label="MESES">
+                            <option value="month-0">Janeiro</option>
+                            <option value="month-1">Fevereiro</option>
+                            <option value="month-2">Março</option>
+                            <option value="month-3">Abril</option>
+                            <option value="month-4">Maio</option>
+                            <option value="month-5">Junho</option>
+                            <option value="month-6">Julho</option>
+                            <option value="month-7">Agosto</option>
+                            <option value="month-8">Setembro</option>
+                            <option value="month-9">Outubro</option>
+                            <option value="month-10">Novembro</option>
+                            <option value="month-11">Dezembro</option>
+                        </optgroup>
+                        <optgroup label="TRIMESTRES">
+                            <option value="q1">Q1 (Jan-Mar)</option>
+                            <option value="q2">Q2 (Abr-Jun)</option>
+                            <option value="q3">Q3 (Jul-Set)</option>
+                            <option value="q4">Q4 (Out-Dez)</option>
+                        </optgroup>
+                        <optgroup label="ANO">
+                            <option value="year" selected>Ano Completo</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATUS -->
+        <div id="statusBar" class="status-bar">
+            <div class="status-text" id="statusText">⏳ Carregando dados...</div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Receita Total</div>
+                <div class="kpi-value" id="totalRevenue">€ 0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Custo Total</div>
+                <div class="kpi-value" id="totalCost">€ 0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Lucro Total</div>
+                <div class="kpi-value" id="totalProfit">€ 0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Margem de Lucro</div>
+                <div class="kpi-value" id="profitMargin">0%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ticket Médio</div>
+                <div class="kpi-value" id="avgTicket">€ 0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total de Pedidos</div>
+                <div class="kpi-value" id="totalOrders">0</div>
+            </div>
+        </div>
+
+        <!-- CHART -->
+        <div class="charts-grid">
+            <div class="chart-wrapper full-width">
+                <h3 class="chart-title">📈 Evolução Mensal: Receita vs Lucro</h3>
+                <div class="chart-container">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELAS -->
+        <div class="table-wrapper">
+            <h3 class="table-title">💰 Rendimentos (SNC)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="rendimentosTable">
+                    <tr><td colspan="3" style="text-align: center; color: #a0b4c7;">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <h3 class="table-title">📉 Gastos (SNC)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="gastosTable">
+                    <tr><td colspan="3" style="text-align: center; color: #a0b4c7;">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>📅 Dashboard Financeiro - Cliente</p>
+            <p style="margin-top: 10px; color: #5a6d7a;" id="lastUpdateText">Aguardando dados...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        // ============ CONFIGURAÇÃO ============
+        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        let dashboardData = null;
+        let currentPeriod = 'year';
+        let chartInstance = null;
+
+        // ============ INICIALIZAÇÃO ============
+        async function init() {
+            showStatus('⏳ Carregando dados...', 'loading');
+            
+            // Tentar carregar de localStorage primeiro (sincronizado pelo Admin)
+            let data = localStorage.getItem('dashboardData');
+            
+            if (!data) {
+                // Se não houver em localStorage, mostrar mensagem
+                showStatus('⚠️ Aguardando dados do administrador...', 'error');
+                showNoDataMessage();
+                return;
+            }
+
+            try {
+                dashboardData = JSON.parse(data);
+                showStatus('✅ Dados carregados com sucesso!', 'success');
+                updateLastUpdateTime();
+                renderDashboard();
+            } catch (error) {
+                showStatus('❌ Erro ao carregar dados: ' + error.message, 'error');
+                showNoDataMessage();
+            }
+        }
+
+        function formatEuro(value) {
+            return '€ ' + value.toLocaleString('pt-PT', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function getPeriodMonths() {
+            if (currentPeriod === 'year') {
+                return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            } else if (currentPeriod.startsWith('month-')) {
+                const idx = parseInt(currentPeriod.split('-')[1]);
+                return [idx];
+            } else if (currentPeriod === 'q1') {
+                return [0, 1, 2];
+            } else if (currentPeriod === 'q2') {
+                return [3, 4, 5];
+            } else if (currentPeriod === 'q3') {
+                return [6, 7, 8];
+            } else if (currentPeriod === 'q4') {
+                return [9, 10, 11];
+            }
+            return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        }
+
+        function calculateTotals() {
+            if (!dashboardData || !dashboardData.monthsData) {
+                return { totalRevenue: 0, totalCost: 0, totalProfit: 0, totalOrders: 0, avgMargin: 0, avgTicket: 0 };
+            }
+
+            const indices = getPeriodMonths();
+            const data = dashboardData.monthsData.filter((_, i) => indices.includes(i));
+            
+            const totalRevenue = data.reduce((sum, m) => sum + (m.revenue || 0), 0);
+            const totalCost = data.reduce((sum, m) => sum + (m.cost || 0), 0);
+            const totalProfit = totalRevenue - totalCost;
+            const totalOrders = data.reduce((sum, m) => sum + (m.orders || 0), 0);
+            const avgMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0;
+            const avgTicket = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+
+            return { totalRevenue, totalCost, totalProfit, totalOrders, avgMargin, avgTicket };
+        }
+
+        function renderDashboard() {
+            if (!dashboardData) return;
+
+            // Atualizar header
+            if (currentPeriod === 'year') {
+                document.getElementById('headerDate').textContent = 'Ano Completo';
+            } else if (currentPeriod.startsWith('month-')) {
+                const idx = parseInt(currentPeriod.split('-')[1]);
+                document.getElementById('headerDate').textContent = months[idx];
+            } else if (currentPeriod === 'q1') {
+                document.getElementById('headerDate').textContent = 'Q1 (Jan-Mar)';
+            } else if (currentPeriod === 'q2') {
+                document.getElementById('headerDate').textContent = 'Q2 (Abr-Jun)';
+            } else if (currentPeriod === 'q3') {
+                document.getElementById('headerDate').textContent = 'Q3 (Jul-Set)';
+            } else if (currentPeriod === 'q4') {
+                document.getElementById('headerDate').textContent = 'Q4 (Out-Dez)';
+            }
+
+            // Atualizar KPIs
+            const { totalRevenue, totalCost, totalProfit, totalOrders, avgMargin, avgTicket } = calculateTotals();
+            document.getElementById('totalRevenue').textContent = formatEuro(totalRevenue);
+            document.getElementById('totalCost').textContent = formatEuro(totalCost);
+            document.getElementById('totalProfit').textContent = formatEuro(totalProfit);
+            document.getElementById('totalOrders').textContent = totalOrders.toLocaleString('pt-PT');
+            document.getElementById('profitMargin').textContent = avgMargin + '%';
+            document.getElementById('avgTicket').textContent = formatEuro(avgTicket);
+
+            // Atualizar gráfico
+            updateChart();
+
+            // Atualizar tabelas
+            updateTables();
+        }
+
+        function updateChart() {
+            if (!dashboardData || !dashboardData.monthsData) return;
+
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const indices = getPeriodMonths();
+            const chartData = dashboardData.monthsData.filter((_, i) => indices.includes(i));
+            const chartLabels = chartData.map(m => m.month);
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Receita',
+                            data: chartData.map(m => m.revenue),
+                            borderColor: '#0EA5A0',
+                            backgroundColor: 'rgba(14, 165, 160, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#0EA5A0',
+                            pointBorderColor: '#1B3A4B',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Lucro',
+                            data: chartData.map(m => m.revenue - m.cost),
+                            borderColor: '#C9A84C',
+                            backgroundColor: 'rgba(201, 168, 76, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#C9A84C',
+                            pointBorderColor: '#1B3A4B',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { family: "'DM Sans', sans-serif", size: 12, weight: '500' },
+                                color: '#E8F0F3',
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(27, 58, 75, 0.95)',
+                            borderColor: '#0EA5A0',
+                            borderWidth: 1,
+                            titleFont: { family: "'Montserrat', sans-serif", size: 12, weight: '700' },
+                            bodyFont: { family: "'DM Sans', sans-serif", size: 11 },
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#a0b4c7' },
+                            grid: { color: '#2A3F52', drawBorder: false }
+                        },
+                        y: {
+                            ticks: { color: '#a0b4c7', callback: v => formatEuro(v) },
+                            grid: { color: '#2A3F52', drawBorder: false }
+                        },
+                        y1: {
+                            position: 'right',
+                            ticks: { color: '#a0b4c7', callback: v => formatEuro(v) },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTables() {
+            if (!dashboardData) return;
+
+            const indices = getPeriodMonths();
+            let rendHtml = '';
+            let gastHtml = '';
+
+            if (dashboardData.monthlyRevenues) {
+                Object.entries(dashboardData.monthlyRevenues).forEach(([conta, valores]) => {
+                    const total = indices.reduce((sum, idx) => sum + (valores[idx] || 0), 0);
+                    if (total > 0) {
+                        rendHtml += `<tr>
+                            <td><strong>${conta}</strong></td>
+                            <td>Conta ${conta}</td>
+                            <td class="value-positive">${formatEuro(total)}</td>
+                        </tr>`;
+                    }
+                });
+            }
+
+            if (dashboardData.monthlyExpenses) {
+                Object.entries(dashboardData.monthlyExpenses).forEach(([conta, valores]) => {
+                    const total = indices.reduce((sum, idx) => sum + (valores[idx] || 0), 0);
+                    if (total > 0) {
+                        gastHtml += `<tr>
+                            <td><strong>${conta}</strong></td>
+                            <td>Conta ${conta}</td>
+                            <td class="value-positive">${formatEuro(total)}</td>
+                        </tr>`;
+                    }
+                });
+            }
+
+            document.getElementById('rendimentosTable').innerHTML = rendHtml || '<tr><td colspan="3" style="text-align: center; color: #a0b4c7;">Sem dados</td></tr>';
+            document.getElementById('gastosTable').innerHTML = gastHtml || '<tr><td colspan="3" style="text-align: center; color: #a0b4c7;">Sem dados</td></tr>';
+        }
+
+        function changePeriod(value) {
+            currentPeriod = value;
+            renderDashboard();
+        }
+
+        function showStatus(message, type) {
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            
+            statusBar.classList.remove('loading', 'success', 'error');
+            if (type) {
+                statusBar.classList.add('active', type);
+            } else {
+                statusBar.classList.remove('active');
+            }
+            
+            statusText.textContent = message;
+        }
+
+        function updateLastUpdateTime() {
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            if (lastUpdate) {
+                document.getElementById('lastUpdateText').textContent = '✅ Dados atualizados em: ' + lastUpdate;
+            }
+        }
+
+        function showNoDataMessage() {
+            const rendTable = document.getElementById('rendimentosTable');
+            const gastTable = document.getElementById('gastosTable');
+            
+            rendTable.innerHTML = '<tr><td colspan="3"><div class="no-data-message"><h2>⚠️ Sem Dados</h2><p>O administrador ainda não carregou dados. Aguarde...</p></div></td></tr>';
+            gastTable.innerHTML = '<tr><td colspan="3"><div class="no-data-message"><h2>⚠️ Sem Dados</h2><p>O administrador ainda não carregou dados. Aguarde...</p></div></td></tr>';
+        }
+
+        // Iniciar ao carregar
+        window.addEventListener('load', init);
+        
+        // Recarregar dados a cada 10 segundos (se dados foram atualizados)
+        setInterval(() => {
+            const data = localStorage.getItem('dashboardData');
+            if (data) {
+                dashboardData = JSON.parse(data);
+                renderDashboard();
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
