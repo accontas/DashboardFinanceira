@@ -272,8 +272,10 @@
                 const conta1char = conta.substring(0, 1);
                 
                 if (conta1char === '7') {
-                    totalRendimentos += dados.totalMovimento;
+                    // Classe 7: valores negativos são vendas, converter para positivos
+                    totalRendimentos += Math.abs(dados.totalMovimento);
                 } else if (conta1char === '6') {
+                    // Classe 6: já correto
                     totalGastos += dados.totalMovimento;
                 }
             });
@@ -303,7 +305,8 @@
                     if (!rendimentosData[agrupador]) {
                         rendimentosData[agrupador] = { valor: 0, descritivo: dados.descritivo };
                     }
-                    rendimentosData[agrupador].valor += dados.totalMovimento;
+                    // Inverter sinal para rendimentos
+                    rendimentosData[agrupador].valor += Math.abs(dados.totalMovimento);
                 }
             });
 
@@ -357,7 +360,10 @@
             const contas = Object.entries(filteredData.contas || {}).sort((a, b) => a[0].localeCompare(b[0]));
 
             contas.forEach(([conta, dados]) => {
-                html += `<tr><td><strong>${conta}</strong></td><td>${dados.descritivo}</td><td>${formatEuro(dados.totalMovimento)}</td></tr>`;
+                const conta1char = conta.substring(0, 1);
+                // Inverter sinal para classe 7 na tabela também
+                const valorExibir = conta1char === '7' ? Math.abs(dados.totalMovimento) : dados.totalMovimento;
+                html += `<tr><td><strong>${conta}</strong></td><td>${dados.descritivo}</td><td>${formatEuro(valorExibir)}</td></tr>`;
             });
 
             document.getElementById('contasTable').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px;">Sem dados</td></tr>';
@@ -375,7 +381,8 @@
 
                 const conta1char = mov.conta.substring(0, 1);
                 if (conta1char === '7') {
-                    months[month].rendimentos += mov.movimento;
+                    // Inverter sinal para classe 7
+                    months[month].rendimentos += Math.abs(mov.movimento);
                 } else if (conta1char === '6') {
                     months[month].gastos += mov.movimento;
                 }
@@ -414,16 +421,21 @@
         }
 
         function showDetalhes(agrupador) {
-            const movimentos = (filteredData.movimentos || []).filter(m => m.conta.startsWith(agrupador));
+            const movimentos = (filteredData.movimentos || [])
+                .filter(m => m.conta.startsWith(agrupador))
+                .filter(m => Math.abs(m.movimento) > 0.00 && !m.descritivo.toLowerCase().includes('saldo inicial'));
             
             document.getElementById('modalTitle').textContent = `Detalhes - Conta ${agrupador}`;
 
             let html = '';
             movimentos.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(mov => {
-                html += `<tr><td>${mov.data}</td><td>${mov.descritivo}</td><td>${formatEuro(mov.movimento)}</td><td>${mov.terceiro || '-'}</td></tr>`;
+                const conta1char = mov.conta.substring(0, 1);
+                // Inverter sinal para classe 7 no modal também
+                const valorExibir = conta1char === '7' ? Math.abs(mov.movimento) : mov.movimento;
+                html += `<tr><td>${mov.data}</td><td>${mov.descritivo}</td><td>${formatEuro(valorExibir)}</td><td>${mov.terceiro || '-'}</td></tr>`;
             });
 
-            document.getElementById('modalTable').innerHTML = html;
+            document.getElementById('modalTable').innerHTML = html || '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem movimentos</td></tr>';
             document.getElementById('detalheModal').style.display = 'block';
         }
 
