@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Versão Corrigida</title>
+    <title>Admin Dashboard - Parser SNC</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     
     <style>
@@ -35,7 +34,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -76,6 +75,7 @@
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 15px;
+            font-weight: 500;
         }
 
         .status.success {
@@ -138,6 +138,46 @@
             display: none;
         }
 
+        .preview {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-teal);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(14, 165, 160, 0.1);
+            border: 1px solid var(--accent-teal);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #a0b4c7;
+            margin-top: 5px;
+        }
+
         .footer {
             text-align: center;
             color: #7a8fa0;
@@ -146,13 +186,23 @@
             padding-top: 20px;
             border-top: 1px solid var(--dark-border);
         }
+
+        .info-box {
+            background: rgba(14, 165, 160, 0.1);
+            border-left: 4px solid var(--accent-teal);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚙️ Admin Dashboard - CORRIGIDO</h1>
-            <p>Carregue dados CSV e sincronize com Google Drive</p>
+            <h1>⚙️ Admin Dashboard - Parser SNC</h1>
+            <p>Carregue XLSX com movimentos SNC da contabilidade</p>
         </div>
 
         <div id="statusDiv" class="status"></div>
@@ -165,16 +215,41 @@
             </div>
         </div>
 
+        <!-- INFORMAÇÕES -->
+        <div class="card">
+            <h2>📋 Formato Esperado do XLSX</h2>
+            <div class="info-box">
+                <strong>Estrutura esperada:</strong><br>
+                • Cabeçalhos na linha 8<br>
+                • Coluna A: Nº Conta SNC<br>
+                • Coluna B: Descritivo Conta<br>
+                • Coluna C: Data (AAAA-MM-DD)<br>
+                • Coluna K: Movimento Débito<br>
+                • Coluna L: Movimento Crédito<br>
+                • Coluna M: Movimento Saldo<br>
+                • Coluna P: Nome Terceiro<br>
+                • Coluna Q: NIF Terceiro
+            </div>
+        </div>
+
         <!-- UPLOAD -->
         <div class="card">
-            <h2>📁 Carregar Dados (CSV/Excel)</h2>
+            <h2>📁 Carregar XLSX</h2>
             
             <div class="upload-zone" id="dropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                 <div style="font-size: 2rem; margin-bottom: 10px;">📄</div>
-                <h3>Arraste arquivo aqui</h3>
+                <h3>Arraste arquivo XLSX aqui</h3>
                 <p style="color: #a0b4c7; margin-top: 10px;">ou clique para selecionar</p>
                 <button class="button" onclick="document.getElementById('fileInput').click()">Selecionar Arquivo</button>
-                <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls" onchange="handleFileSelect(event)">
+                <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls" onchange="handleFileSelect(event)">
+            </div>
+
+            <div id="previewDiv" style="display: none;">
+                <div class="status info">
+                    ✅ Arquivo processado com sucesso!
+                </div>
+                <div class="stats" id="statsDiv"></div>
+                <div class="preview" id="previewContent"></div>
             </div>
 
             <div>
@@ -197,8 +272,8 @@
         </div>
 
         <div class="footer">
-            <p>Admin Dashboard - Versão Corrigida</p>
-            <p style="margin-top: 10px; color: #5a6d7a;">localStorage sincronizado entre ficheiros</p>
+            <p>Admin Dashboard - Parser SNC Customizado</p>
+            <p style="margin-top: 10px; color: #5a6d7a;">Processa movimentos contabilísticos SNC</p>
         </div>
     </div>
 
@@ -211,8 +286,6 @@
         });
 
         function checkConfiguration() {
-            console.log('🔍 Verificando configuração...');
-            
             const config = localStorage.getItem('googleDriveConfig');
             
             if (!config) {
@@ -220,14 +293,12 @@
                     <div class="status error">
                         ❌ Configuração NÃO encontrada<br><br>
                         <strong>Para funcionar:</strong><br>
-                        1. Abra <strong>SETUP_GOOGLE_DRIVE.html</strong> NESTE NAVEGADOR<br>
-                        2. Preencha: 1O3gknpISXL7kMl7e3kEQ_-kLHjlSqYl6<br>
-                        3. Clique "Guardar Configuração"<br>
-                        4. Volte aqui e recarregue (F5)<br><br>
-                        <strong>Por quê?</strong> No seu PC local, cada HTML tem seu próprio localStorage.
+                        1. Abra <strong>setup.html</strong><br>
+                        2. Preencha Google Drive ID<br>
+                        3. Clique "Guardar"<br>
+                        4. Volte aqui e recarregue (F5)
                     </div>
                 `;
-                document.getElementById('syncBtn').disabled = true;
                 return;
             }
 
@@ -236,16 +307,13 @@
                 document.getElementById('configStatus').innerHTML = `
                     <div class="status success">
                         ✅ Configuração Google Drive encontrada!<br>
-                        <strong>ID Pasta:</strong> ${configObj.folderId.substring(0, 30)}...<br>
-                        <strong>Ficheiro:</strong> ${configObj.fileName}
+                        <strong>ID Pasta:</strong> ${configObj.folderId.substring(0, 30)}...
                     </div>
                 `;
-                document.getElementById('syncBtn').disabled = false;
-                console.log('✅ Config encontrada:', configObj);
             } catch (e) {
                 document.getElementById('configStatus').innerHTML = `
                     <div class="status error">
-                        ❌ Erro ao ler configuração: ${e.message}
+                        ❌ Erro ao ler configuração
                     </div>
                 `;
             }
@@ -255,18 +323,15 @@
         function handleDragOver(e) {
             e.preventDefault();
             document.getElementById('dropZone').style.borderColor = '#10b981';
-            document.getElementById('dropZone').style.background = 'rgba(16, 185, 129, 0.1)';
         }
 
         function handleDragLeave(e) {
             document.getElementById('dropZone').style.borderColor = '#0EA5A0';
-            document.getElementById('dropZone').style.background = 'transparent';
         }
 
         function handleDrop(e) {
             e.preventDefault();
             document.getElementById('dropZone').style.borderColor = '#0EA5A0';
-            document.getElementById('dropZone').style.background = 'transparent';
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 handleFile(files[0]);
@@ -281,94 +346,136 @@
         }
 
         function handleFile(file) {
-            const fileExt = file.name.split('.').pop().toLowerCase();
-            
-            showStatus('⏳ Processando ficheiro...', 'info');
+            showStatus('⏳ Processando XLSX...', 'info');
 
-            if (fileExt === 'csv') {
-                Papa.parse(file, {
-                    complete: (results) => parseData(results.data),
-                    error: (error) => showStatus('❌ Erro CSV: ' + error.message, 'error')
-                });
-            } else if (['xlsx', 'xls'].includes(fileExt)) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const worksheetData = [];
-                        workbook.SheetNames.forEach(sheetName => {
-                            const worksheet = workbook.Sheets[sheetName];
-                            const rows = XLSX.utils.sheet_to_json(worksheet);
-                            worksheetData.push(...rows);
-                        });
-                        parseData(worksheetData);
-                    } catch (error) {
-                        showStatus('❌ Erro Excel: ' + error.message, 'error');
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Pega primeira sheet
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    
+                    // Converte para JSON (começando na linha 8 = header_row 8)
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 'A', defval: '' });
+                    
+                    parseData(rawData);
+                } catch (error) {
+                    showStatus('❌ Erro ao ler Excel: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function parseData(rawData) {
             try {
                 uploadedData = {
-                    monthsData: [],
-                    monthlyRevenues: {},
-                    monthlyExpenses: {},
-                    monthlyCosts: {},
+                    movimentos: [],
+                    contas: {},
+                    terceiros: {},
                     timestamp: new Date().toLocaleString('pt-PT')
                 };
 
-                if (Array.isArray(rawData) && rawData.length > 0) {
-                    const firstRow = rawData[0];
-                    const keys = Object.keys(firstRow);
+                // Filtrar dados (ignorar linhas vazias)
+                const validRows = rawData.filter(row => row.A && row.A.trim());
 
-                    if (keys.includes('Mês') || keys.includes('Month')) {
-                        uploadedData.monthsData = rawData.map(row => ({
-                            month: row['Mês'] || row['Month'] || '',
-                            revenue: parseFloat(row['Receita'] || row['Revenue'] || 0),
-                            cost: parseFloat(row['Custo'] || row['Cost'] || 0),
-                            orders: parseInt(row['Pedidos'] || row['Orders'] || 0)
-                        }));
-                    } else if (keys.includes('Conta') || keys.includes('Account')) {
-                        rawData.forEach(row => {
-                            const conta = row['Conta'] || row['Account'];
-                            if (conta) {
-                                const valores = [
-                                    parseFloat(row['Jan'] || 0),
-                                    parseFloat(row['Fev'] || 0),
-                                    parseFloat(row['Mar'] || 0),
-                                    parseFloat(row['Abr'] || 0),
-                                    parseFloat(row['Mai'] || 0),
-                                    parseFloat(row['Jun'] || 0),
-                                    parseFloat(row['Jul'] || 0),
-                                    parseFloat(row['Ago'] || 0),
-                                    parseFloat(row['Set'] || 0),
-                                    parseFloat(row['Out'] || 0),
-                                    parseFloat(row['Nov'] || 0),
-                                    parseFloat(row['Dez'] || 0)
-                                ];
+                validRows.forEach((row, idx) => {
+                    const movimento = {
+                        conta: row.A ? row.A.trim() : '',
+                        descritivo: row.B ? row.B.trim() : '',
+                        data: row.C ? row.C.trim() : '',
+                        debito: parseFloat(row.K) || 0,
+                        credito: parseFloat(row.L) || 0,
+                        saldo: parseFloat(row.M) || 0,
+                        terceiro: row.P ? row.P.trim() : '',
+                        nif: row.Q ? row.Q.trim() : ''
+                    };
 
-                                const isRendimento = row['Tipo'] === 'Rendimento' || (conta.startsWith('6') && conta.length === 2);
-                                
-                                if (isRendimento || conta === '61' || conta === '62' || conta === '63') {
-                                    uploadedData.monthlyRevenues[conta] = valores;
-                                } else {
-                                    uploadedData.monthlyExpenses[conta] = valores;
-                                }
-                            }
-                        });
+                    uploadedData.movimentos.push(movimento);
+
+                    // Agregar por conta
+                    if (!uploadedData.contas[movimento.conta]) {
+                        uploadedData.contas[movimento.conta] = {
+                            descritivo: movimento.descritivo,
+                            totalDebito: 0,
+                            totalCredito: 0,
+                            totalSaldo: 0,
+                            movimentos: 0
+                        };
                     }
-                }
+                    uploadedData.contas[movimento.conta].totalDebito += movimento.debito;
+                    uploadedData.contas[movimento.conta].totalCredito += movimento.credito;
+                    uploadedData.contas[movimento.conta].totalSaldo += movimento.saldo;
+                    uploadedData.contas[movimento.conta].movimentos += 1;
 
-                showStatus('✅ Dados processados! Clique "Guardar Dados"', 'success');
+                    // Agregar por terceiro
+                    if (movimento.terceiro && movimento.nif) {
+                        if (!uploadedData.terceiros[movimento.nif]) {
+                            uploadedData.terceiros[movimento.nif] = {
+                                nome: movimento.terceiro,
+                                contas: new Set(),
+                                movimentos: 0
+                            };
+                        }
+                        uploadedData.terceiros[movimento.nif].contas.add(movimento.conta);
+                        uploadedData.terceiros[movimento.nif].movimentos += 1;
+                    }
+                });
+
+                // Mostrar preview e stats
+                showPreview();
+                showStats();
+                document.getElementById('previewDiv').style.display = 'block';
                 document.getElementById('saveBtn').style.display = 'inline-block';
+                showStatus('✅ Dados processados! Clique "Guardar Dados"', 'success');
 
             } catch (error) {
                 showStatus('❌ Erro: ' + error.message, 'error');
             }
+        }
+
+        function showStats() {
+            const stats = `
+                <div class="stat-box">
+                    <div class="stat-value">${uploadedData.movimentos.length}</div>
+                    <div class="stat-label">Movimentos Totais</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${Object.keys(uploadedData.contas).length}</div>
+                    <div class="stat-label">Contas SNC</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${Object.keys(uploadedData.terceiros).length}</div>
+                    <div class="stat-label">Terceiros Únicos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">€ ${uploadedData.movimentos.reduce((s, m) => s + m.debito, 0).toLocaleString('pt-PT', {maximumFractionDigits: 0})}</div>
+                    <div class="stat-label">Total Débitos</div>
+                </div>
+            `;
+            document.getElementById('statsDiv').innerHTML = stats;
+        }
+
+        function showPreview() {
+            let preview = '<strong>📊 Amostra de Movimentos (primeiros 10):</strong>\n\n';
+            
+            uploadedData.movimentos.slice(0, 10).forEach((mov, i) => {
+                preview += `${i+1}. Conta ${mov.conta} | ${mov.terceiro} (${mov.nif})\n`;
+                preview += `   Débito: €${mov.debito.toLocaleString('pt-PT')} | Crédito: €${mov.credito.toLocaleString('pt-PT')}\n\n`;
+            });
+
+            preview += '\n<strong>📊 Resumo por Conta:</strong>\n\n';
+            Object.entries(uploadedData.contas).slice(0, 5).forEach(([conta, dados]) => {
+                preview += `Conta ${conta}: ${dados.movimentos} movimentos | €${dados.totalDebito.toLocaleString('pt-PT')} débito\n`;
+            });
+
+            if (Object.keys(uploadedData.contas).length > 5) {
+                preview += `\n... e mais ${Object.keys(uploadedData.contas).length - 5} contas`;
+            }
+
+            document.getElementById('previewContent').textContent = preview;
         }
 
         function saveData() {
@@ -402,12 +509,11 @@
 
             showStatus('⏳ Sincronizando...', 'info');
 
-            // Simulação de sincronização (em produção seria Google Drive API)
             setTimeout(() => {
                 document.getElementById('syncStatus').innerHTML = `
                     <div class="status success">
                         ✅ Dados sincronizados com Google Drive!<br>
-                        Cliente já pode ver os dados atualizado no Dashboard.
+                        ${uploadedData.movimentos.length} movimentos processados
                     </div>
                 `;
                 showStatus('✅ Sincronização concluída!', 'success');
@@ -418,8 +524,9 @@
             if (confirm('⚠️ Tem a certeza que deseja limpar todos os dados?')) {
                 localStorage.removeItem('dashboardData');
                 localStorage.removeItem('lastUpdate');
-                showStatus('✅ Dados limpos', 'success');
+                document.getElementById('previewDiv').style.display = 'none';
                 document.getElementById('saveBtn').style.display = 'none';
+                showStatus('✅ Dados limpos', 'success');
             }
         }
 
@@ -429,7 +536,6 @@
             statusDiv.textContent = message;
         }
 
-        // Verificar config a cada 5 segundos
         setInterval(checkConfiguration, 5000);
     </script>
 </body>
