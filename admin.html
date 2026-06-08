@@ -8,18 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/xlsx@latest/dist/xlsx.full.min.js"></script>
     
-    <script>
-        // Aguardar que XLSX carregue
-        function waitForXLSX() {
-            if (typeof XLSX === 'undefined') {
-                setTimeout(waitForXLSX, 100);
-            } else {
-                console.log('✅ XLSX carregado com sucesso');
-            }
-        }
-        waitForXLSX();
-    </script>
-    
     <style>
         * {
             margin: 0;
@@ -219,7 +207,6 @@
 
         <div id="statusDiv" class="status"></div>
 
-        <!-- CONFIGURAÇÃO -->
         <div class="card">
             <h2>🔧 Configuração Google Drive</h2>
             <div id="configStatus" class="status error">
@@ -227,13 +214,14 @@
             </div>
         </div>
 
-        <!-- INFORMAÇÕES -->
         <div class="card">
             <h2>📋 Formato Esperado do XLSX</h2>
             <div class="info-box">
                 <strong>Estrutura esperada:</strong><br>
-                • Cabeçalhos na linha 8<br>
-                • Coluna A: Nº Conta SNC<br>
+                • Linhas 1-7: Ignoradas (cabeçalhos ou textos)<br>
+                • Linha 8: Cabeçalhos das colunas<br>
+                • Linha 9+: Dados dos movimentos<br>
+                • Coluna A: Nº Conta SNC (ex: 611, 621, 711)<br>
                 • Coluna B: Descritivo Conta<br>
                 • Coluna C: Data (AAAA-MM-DD)<br>
                 • Coluna K: Movimento Débito<br>
@@ -244,7 +232,6 @@
             </div>
         </div>
 
-        <!-- UPLOAD -->
         <div class="card">
             <h2>📁 Carregar XLSX</h2>
             
@@ -274,7 +261,6 @@
             </div>
         </div>
 
-        <!-- SINCRONIZAR -->
         <div class="card">
             <h2>☁️ Sincronizar com Google Drive</h2>
             <button class="button" id="syncBtn" onclick="syncData()">
@@ -285,14 +271,15 @@
 
         <div class="footer">
             <p>Admin Dashboard - Parser SNC Customizado</p>
-            <p style="margin-top: 10px; color: #5a6d7a;">Processa movimentos contabilísticos SNC</p>
+            <p style="margin-top: 10px; color: #5a6d7a;">Processa movimentos contabilísticos SNC (linhas 9+)</p>
         </div>
     </div>
+
+    <script src="https://unpkg.com/xlsx@latest/dist/xlsx.full.min.js"></script>
 
     <script>
         let uploadedData = null;
 
-        // ============ VERIFICAR CONFIGURAÇÃO ============
         window.addEventListener('load', function() {
             checkConfiguration();
         });
@@ -331,7 +318,6 @@
             }
         }
 
-        // ============ UPLOAD ============
         function handleDragOver(e) {
             e.preventDefault();
             document.getElementById('dropZone').style.borderColor = '#10b981';
@@ -360,7 +346,6 @@
         function handleFile(file) {
             showStatus('⏳ Processando XLSX...', 'info');
 
-            // Aguardar que XLSX esteja disponível
             if (typeof XLSX === 'undefined') {
                 showStatus('❌ Erro: Biblioteca XLSX ainda está a carregar. Tente novamente em 2 segundos.', 'error');
                 return;
@@ -372,12 +357,16 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     
-                    // Pega primeira sheet
                     const sheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[sheetName];
                     
-                    // Converte para JSON (começando na linha 8 = header_row 8)
-                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 'A', defval: '' });
+                    // LER A PARTIR DA LINHA 8 (cabeçalhos) - XLSX usa 0-based
+                    // header_row: 7 significa linha 8 (índice 7)
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { 
+                        header: 'A',
+                        defval: '',
+                        range: 7  // Começa na linha 8 (índice 7)
+                    });
                     
                     parseData(rawData);
                 } catch (error) {
@@ -396,20 +385,35 @@
                     timestamp: new Date().toLocaleString('pt-PT')
                 };
 
-                // Filtrar dados (ignorar linhas vazias)
-                const validRows = rawData.filter(row => row.A && row.A.trim());
+                // Filtrar dados (ignorar linhas vazias e linhas de texto)
+                const validRows = rawData.filter(row => {
+                    const conta = row.A ? row.A.trim() : '';
+                    // Só aceita se coluna A parece um número de conta (começa com 6 ou 7 e tem dígitos)
+                    return conta && /^[67]\d{2,}$/.test(conta);
+                });
 
                 validRows.forEach((row, idx) => {
                     const movimento = {
                         conta: row.A ? row.A.trim() : '',
                         descritivo: row.B ? row.B.trim() : '',
-                        data: row.C ? row.C.trim() : '',
+                        data: row.C ? row.C.toString().trim() : '',
                         debito: parseFloat(row.K) || 0,
                         credito: parseFloat(row.L) || 0,
                         saldo: parseFloat(row.M) || 0,
                         terceiro: row.P ? row.P.trim() : '',
                         nif: row.Q ? row.Q.trim() : ''
                     };
+
+                    // Validar data
+                    if (movimento.data && !movimento.data.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        // Se data está em formato diferente, tentar converter
+                        try {
+                            const dateObj = new Date(movimento.data);
+                            movimento.data = dateObj.toISOString().split('T')[0];
+                        } catch (e) {
+                            // Ignorar se não conseguir converter
+                        }
+                    }
 
                     uploadedData.movimentos.push(movimento);
 
@@ -442,12 +446,11 @@
                     }
                 });
 
-                // Mostrar preview e stats
                 showPreview();
                 showStats();
                 document.getElementById('previewDiv').style.display = 'block';
                 document.getElementById('saveBtn').style.display = 'inline-block';
-                showStatus('✅ Dados processados! Clique "Guardar Dados"', 'success');
+                showStatus('✅ Dados processados! Linhas lidas: ' + validRows.length + '. Clique "Guardar Dados"', 'success');
 
             } catch (error) {
                 showStatus('❌ Erro: ' + error.message, 'error');
@@ -458,7 +461,7 @@
             const stats = `
                 <div class="stat-box">
                     <div class="stat-value">${uploadedData.movimentos.length}</div>
-                    <div class="stat-label">Movimentos Totais</div>
+                    <div class="stat-label">Movimentos</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-value">${Object.keys(uploadedData.contas).length}</div>
@@ -466,7 +469,7 @@
                 </div>
                 <div class="stat-box">
                     <div class="stat-value">${Object.keys(uploadedData.terceiros).length}</div>
-                    <div class="stat-label">Terceiros Únicos</div>
+                    <div class="stat-label">Terceiros</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-value">€ ${uploadedData.movimentos.reduce((s, m) => s + m.debito, 0).toLocaleString('pt-PT', {maximumFractionDigits: 0})}</div>
@@ -477,20 +480,26 @@
         }
 
         function showPreview() {
-            let preview = '<strong>📊 Amostra de Movimentos (primeiros 10):</strong>\n\n';
+            let preview = '<strong>📊 Primeiros 10 movimentos processados:</strong>\n\n';
             
             uploadedData.movimentos.slice(0, 10).forEach((mov, i) => {
-                preview += `${i+1}. Conta ${mov.conta} | ${mov.terceiro} (${mov.nif})\n`;
+                preview += `${i+1}. Conta ${mov.conta} | ${mov.data} | ${mov.terceiro}\n`;
+                preview += `   ${mov.descritivo}\n`;
                 preview += `   Débito: €${mov.debito.toLocaleString('pt-PT')} | Crédito: €${mov.credito.toLocaleString('pt-PT')}\n\n`;
             });
 
-            preview += '\n<strong>📊 Resumo por Conta:</strong>\n\n';
-            Object.entries(uploadedData.contas).slice(0, 5).forEach(([conta, dados]) => {
-                preview += `Conta ${conta}: ${dados.movimentos} movimentos | €${dados.totalDebito.toLocaleString('pt-PT')} débito\n`;
+            if (uploadedData.movimentos.length > 10) {
+                preview += `\n... e mais ${uploadedData.movimentos.length - 10} movimentos\n`;
+            }
+
+            preview += '\n<strong>📊 Contas encontradas:</strong>\n\n';
+            Object.keys(uploadedData.contas).slice(0, 10).forEach(conta => {
+                const dados = uploadedData.contas[conta];
+                preview += `${conta} (${dados.movimentos} mov): €${dados.totalDebito.toLocaleString('pt-PT')} débito\n`;
             });
 
-            if (Object.keys(uploadedData.contas).length > 5) {
-                preview += `\n... e mais ${Object.keys(uploadedData.contas).length - 5} contas`;
+            if (Object.keys(uploadedData.contas).length > 10) {
+                preview += `\n... e mais ${Object.keys(uploadedData.contas).length - 10} contas`;
             }
 
             document.getElementById('previewContent').textContent = preview;
