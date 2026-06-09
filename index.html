@@ -3,222 +3,1641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Financeiro</title>
+    <title>Dashboard Financeiro - LOCAL TEST v3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #0F1419 0%, #1a2f40 100%);
-            color: #E8F0F3;
-            min-height: 100vh;
-            padding: 40px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 700px;
-            width: 100%;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #E8F0F3;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: #0EA5A0;
-            font-weight: 500;
-        }
-
-        .description {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: #a0b4c7;
-            line-height: 1.6;
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        @media (max-width: 600px) {
-            .buttons {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-        }
-
-        .btn {
-            padding: 18px 24px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-admin {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            grid-column: 1;
-        }
-
-        .btn-dashboard {
-            background: linear-gradient(135deg, #0EA5A0, #0d8f8a);
-            color: white;
-            grid-column: 2;
-        }
-
-        .btn-setup {
-            background: linear-gradient(135deg, #C9A84C, #a07c2c);
-            color: white;
-            grid-column: 1 / -1;
-        }
-
-        .info {
-            background: rgba(14, 165, 160, 0.1);
-            border: 1px solid #0EA5A0;
-            border-radius: 10px;
-            padding: 25px;
-            margin-top: 40px;
-            text-align: left;
-        }
-
-        .info h3 {
-            color: #0EA5A0;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .info p {
-            font-size: 0.95rem;
-            margin-bottom: 12px;
-            color: #a0b4c7;
-            line-height: 1.6;
-        }
-
-        .step {
-            margin-bottom: 12px;
-            padding-left: 30px;
-            position: relative;
-        }
-
-        .step::before {
-            content: attr(data-step);
-            position: absolute;
-            left: 0;
-            top: -2px;
-            width: 24px;
-            height: 24px;
-            background: #0EA5A0;
-            border-radius: 50%;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .note {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 3px solid #10b981;
-            border-radius: 4px;
-            color: #10b981;
-            font-weight: 500;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            color: #7a8fa0;
-            font-size: 0.85rem;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --dark-bg: #0F1419; --dark-card: #1A2332; --dark-border: #2A3F52; --text-light: #E8F0F3; --accent-teal: #0EA5A0; --success: #10b981; --error: #ef4444; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2f40 100%); color: var(--text-light); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid var(--dark-border); flex-wrap: wrap; gap: 20px; }
+        .header h1 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; font-weight: 700; }
+        .header p { color: var(--accent-teal); font-size: 0.95rem; }
+        .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .controls select, .controls button { padding: 10px 16px; border: 2px solid var(--dark-border); background: transparent; color: var(--text-light); border-radius: 8px; cursor: pointer; }
+        .controls button { background: linear-gradient(135deg, var(--accent-teal), #0d8f8a); color: white; }
+        .status-bar { background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 16px; margin-bottom: 30px; border-left: 4px solid var(--accent-teal); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .kpi-card { background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; }
+        .kpi-label { font-size: 0.85rem; color: #a0b4c7; font-weight: 500; margin-bottom: 12px; text-transform: uppercase; }
+        .kpi-value { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 700; }
+        .mapa-wrapper { background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 30px; margin-bottom: 30px; }
+        .mapa-title { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        .mapa-section { margin-bottom: 40px; }
+        .mapa-section-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--accent-teal); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--dark-border); }
+        .mapa-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--dark-border); cursor: pointer; transition: all 0.2s ease; }
+        .mapa-row:hover { background: rgba(14, 165, 160, 0.05); padding-left: 10px; }
+        .mapa-row.total { background: rgba(14, 165, 160, 0.1); font-weight: 700; border-bottom: 2px solid var(--accent-teal); cursor: default; }
+        .mapa-row.result { background: rgba(16, 185, 129, 0.1); font-weight: 700; border: 2px solid var(--success); margin-top: 10px; }
+        .mapa-row.result.negative { background: rgba(239, 68, 68, 0.1); border-color: var(--error); }
+        .mapa-conta { display: flex; gap: 20px; align-items: center; flex: 1; }
+        .mapa-conta-num { font-weight: 700; color: var(--accent-teal); min-width: 60px; }
+        .mapa-conta-desc { color: #a0b4c7; font-size: 0.9rem; }
+        .mapa-valor { font-family: 'Montserrat', sans-serif; font-weight: 600; min-width: 150px; text-align: right; }
+        .chart-wrapper { background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 30px; }
+        .chart-title { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+        .chart-container { position: relative; height: 300px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background: var(--dark-bg); margin: 5% auto; padding: 30px; border: 1px solid var(--dark-border); border-radius: 14px; width: 90%; max-width: 900px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--dark-border); }
+        .modal-title { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--accent-teal); }
+        .close { color: var(--accent-teal); font-size: 2rem; font-weight: bold; cursor: pointer; border: none; background: none; }
+        .close:hover { color: var(--error); }
+        .modal-table { width: 100%; border-collapse: collapse; }
+        .modal-table th { background: rgba(14, 165, 160, 0.1); padding: 12px; text-align: left; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); }
+        .modal-table td { padding: 12px; border-bottom: 1px solid var(--dark-border); }
+        .modal-table tr:hover { background: rgba(14, 165, 160, 0.05); }
+        .footer { text-align: center; padding: 30px; color: #7a8fa0; font-size: 0.85rem; border-top: 1px solid var(--dark-border); margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; }
+        table th { background: rgba(14, 165, 160, 0.1); padding: 12px; text-align: left; font-weight: 600; color: var(--accent-teal); border-bottom: 2px solid var(--dark-border); text-transform: uppercase; font-size: 0.85rem; }
+        table td { padding: 12px; border-bottom: 1px solid var(--dark-border); }
+        .upload-input { padding: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="icon">📊</div>
-            <h1>Dashboard Financeiro</h1>
-            <p class="subtitle">Gestão de Dados Financeiros</p>
-            <p class="description">Sincronização automática com Google Drive</p>
-        </div>
-
-        <div class="buttons">
-            <button class="btn btn-setup" onclick="window.location.href='setup.html'">
-                ⚙️ Setup (Primeira Vez)
-            </button>
-            <button class="btn btn-admin" onclick="window.location.href='admin.html'">
-                👤 Admin (Carregar Dados)
-            </button>
-            <button class="btn btn-dashboard" onclick="window.location.href='dashboard.html'">
-                📈 Dashboard (Visualizar)
-            </button>
-        </div>
-
-        <div class="info">
-            <h3>🎯 Como Usar</h3>
-            
-            <div class="step" data-step="1">
-                <strong>Primeira Vez (Configuração):</strong> Clique em "Setup" para guardar o ID da pasta Google Drive
+            <div>
+                <h1>📊 Dashboard Financeiro</h1>
+                <p id="nomEmpresa" style="color: var(--accent-teal); font-size: 0.95rem;">Carregando...</p>
+                <p id="headerDate">LOCAL TEST v3 - Mapeamento 3/4 dígitos com descritivos SNC</p>
             </div>
-
-            <div class="step" data-step="2">
-                <strong>Mensalmente (Dados):</strong> Clique em "Admin" para carregar o CSV do mês
+            <div style="text-align: right;">
+                <p id="dataUltimaAtualizacao" style="color: #10b981; font-weight: 600; font-size: 0.95rem;">Carregando dados...</p>
             </div>
-
-            <div class="step" data-step="3">
-                <strong>Sempre (Visualizar):</strong> Clique em "Dashboard" para ver os dados atualizados
-            </div>
-
-            <div class="note">
-                ✅ Tudo funciona automaticamente. O cliente apenas precisa de abrir o Dashboard!
+            <div class="controls">
+                <label for="monthSelect">Mês:</label>
+                <select id="monthSelect" onchange="filterByMonth()">
+                    <option value="">Todos os meses</option>
+                    <option value="2026-01">Janeiro 2026</option>
+                    <option value="2026-02">Fevereiro 2026</option>
+                    <option value="2026-03">Março 2026</option>
+                    <option value="2026-04">Abril 2026</option>
+                    <option value="2026-05">Maio 2026</option>
+                    <option value="2026-06">Junho 2026</option>
+                </select>
+                <input type="file" id="fileInput" class="upload-input" accept=".xlsx" onchange="loadXLSX(event)">
             </div>
         </div>
 
-        <div class="footer">
-            <p>📊 Dashboard Financeiro v1.0</p>
-            <p style="margin-top: 10px;">Desenvolvido para gestão eficiente de dados financeiros</p>
+        <div class="status-bar">
+            <div class="status-text" id="statusText">⏳ Carregue um ficheiro XLSX</div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Rendimentos</div>
+                <div class="kpi-value" id="totalRendimentos">€ 0,00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total Gastos</div>
+                <div class="kpi-value" id="totalGastos">€ 0,00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Resultado Operacional</div>
+                <div class="kpi-value" id="resultadoOperacional">€ 0,00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Margem %</div>
+                <div class="kpi-value" id="margem">0,00%</div>
+            </div>
+        </div>
+
+        <div class="chart-wrapper">
+            <h3 class="chart-title">📈 Resultado Operacional por Mês</h3>
+            <div class="chart-container">
+                <canvas id="resultadoChart"></canvas>
+            </div>
+        </div>
+
+        <div class="mapa-wrapper">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="mapa-title">📋 Mapa de Exploração</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="exportarMapaExcel()" style="padding: 6px 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📊 Excel</button>
+                    <button onclick="exportarMapaPDF()" style="padding: 6px 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📄 PDF</button>
+                </div>
+            </div>
+
+            <div class="mapa-section">
+                <div class="mapa-section-title">RENDIMENTOS (Contas 7x)</div>
+                <div id="rendimentosSection"></div>
+                <div class="mapa-row total">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">TOTAL RENDIMENTOS</div>
+                    </div>
+                    <div class="mapa-valor" id="totalRendimentosRow">€ 0,00</div>
+                </div>
+            </div>
+
+            <div class="mapa-section">
+                <div class="mapa-section-title">GASTOS (Contas 6x)</div>
+                <div id="gastosSection"></div>
+                <div class="mapa-row total">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">TOTAL GASTOS</div>
+                    </div>
+                    <div class="mapa-valor" id="totalGastosRow">€ 0,00</div>
+                </div>
+            </div>
+
+            <div class="mapa-section">
+                <div class="mapa-row result" id="resultadoRow">
+                    <div class="mapa-conta">
+                        <div class="mapa-conta-num">RESULTADO LÍQUIDO</div>
+                    </div>
+                    <div class="mapa-valor" id="resultadoValor">€ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 30px;">
+            <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--text-light); margin-bottom: 20px;">📊 Resumo por Conta SNC</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Conta</th>
+                            <th>Descritivo</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contasTable">
+                        <tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABAS DE SALDOS -->
+        <div style="background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 30px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--dark-border); padding-bottom: 15px; flex-wrap: wrap;">
+                <button onclick="showAba('clientes')" id="btnClientes" style="padding: 10px 20px; background: linear-gradient(135deg, var(--accent-teal), #0d8f8a); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">💰 Saldo em Aberto Clientes (21x)</button>
+                <button onclick="showAba('fornecedores')" id="btnFornecedores" style="padding: 10px 20px; background: transparent; color: var(--text-light); border: 2px solid var(--dark-border); border-radius: 8px; cursor: pointer; font-weight: 600;">💳 Saldo em Aberto Fornecedores (22x)</button>
+                <button onclick="showAba('bancarias')" id="btnBancarias" style="padding: 10px 20px; background: transparent; color: var(--text-light); border: 2px solid var(--dark-border); border-radius: 8px; cursor: pointer; font-weight: 600;">🏦 Saldo Contas Bancárias (1x)</button>
+            </div>
+
+            <!-- ABA CLIENTES -->
+            <div id="abaClientes" style="display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; color: var(--accent-teal); margin: 0;">Saldo em Aberto Clientes (Contas 21x)</h4>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="exportarExcel('tabelaClientes', 'Saldo_Clientes')" style="padding: 6px 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📊 Excel</button>
+                        <button onclick="exportarPDF('tabelaClientes', 'Saldo_Clientes')" style="padding: 6px 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📄 PDF</button>
+                    </div>
+                </div>
+                <div style="background: rgba(14, 165, 160, 0.05); border-left: 3px solid var(--accent-teal); padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.85rem; color: #a0b4c7;">
+                    ℹ️ <span id="notaClientes">Valores à data da última submissão dos dados</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NIF</th>
+                                <th>Terceiro / Cliente</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaClientes">
+                            <tr><td colspan="3" style="text-align: center; padding: 20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(14, 165, 160, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-teal);">
+                    <strong>TOTAL SALDO CLIENTES:</strong> <span id="totalClientes" style="float: right; font-size: 1.1rem;">€ 0,00</span>
+                </div>
+            </div>
+
+            <!-- ABA FORNECEDORES -->
+            <div id="abaFornecedores" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; color: var(--accent-teal); margin: 0;">Saldo em Aberto Fornecedores (Contas 22x)</h4>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="exportarExcel('tabelaFornecedores', 'Saldo_Fornecedores')" style="padding: 6px 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📊 Excel</button>
+                        <button onclick="exportarPDF('tabelaFornecedores', 'Saldo_Fornecedores')" style="padding: 6px 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📄 PDF</button>
+                    </div>
+                </div>
+                <div style="background: rgba(14, 165, 160, 0.05); border-left: 3px solid var(--accent-teal); padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.85rem; color: #a0b4c7;">
+                    ℹ️ <span id="notaFornecedores">Valores à data da última submissão dos dados</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NIF</th>
+                                <th>Terceiro / Fornecedor</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaFornecedores">
+                            <tr><td colspan="3" style="text-align: center; padding: 20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(14, 165, 160, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-teal);">
+                    <strong>TOTAL SALDO FORNECEDORES:</strong> <span id="totalFornecedores" style="float: right; font-size: 1.1rem;">€ 0,00</span>
+                </div>
+            </div>
+
+            <!-- ABA BANCARIAS -->
+            <div id="abaBancarias" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; color: var(--accent-teal); margin: 0;">Saldo Contas Bancárias (Contas 1x)</h4>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="exportarExcel('tabelaBancarias', 'Saldo_Bancarias')" style="padding: 6px 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📊 Excel</button>
+                        <button onclick="exportarPDF('tabelaBancarias', 'Saldo_Bancarias')" style="padding: 6px 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">📄 PDF</button>
+                    </div>
+                </div>
+                <div style="background: rgba(14, 165, 160, 0.05); border-left: 3px solid var(--accent-teal); padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.85rem; color: #a0b4c7;">
+                    ℹ️ <span id="notaBancarias">Valores à data da última submissão dos dados</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Conta</th>
+                                <th>Descritivo</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaBancarias">
+                            <tr><td colspan="3" style="text-align: center; padding: 20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(14, 165, 160, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-teal);">
+                    <strong>TOTAL SALDO BANCÁRIO:</strong> <span id="totalBancarias" style="float: right; font-size: 1.1rem;">€ 0,00</span>
+                </div>
+            </div>
+        </div>
+            <p>© 2026 ACContas. Todos os direitos reservados.</p>
         </div>
     </div>
+
+    <div id="detalheModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detalhes da Conta</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>descritivo</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody id="modalTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/xlsx@latest/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        // MAPEAMENTO COMPLETO DE CONTAS SNC (general_ledger.xlsx)
+        const CONTAS_MAPEAMENTO = {
+            "1": "Activos Correntes - Caixa e Equivalentes",
+            "11": "Caixa",
+            "12": "Depósitos à ordem",
+            "13": "Outros depósitos bancários",
+            "14": "Outros",
+            "21": "Clientes - Contas a Receber",
+            "211": "Clientes-Conta-corrente",
+            "212": "Clientes-Adiantamentos",
+            "218": "Clientes-Outros",
+            "22": "Fornecedores - Contas a Pagar",
+            "221": "Fornecedores-Conta-corrente",
+            "222": "Fornecedores-Adiantamentos",
+            "228": "Fornecedores-Outros",
+            "611": "Custo inventários vendidos e matérias consumidas-Mercadorias",
+            "612": "Custo inventários vendidos e matérias consumidas-Matérias-primas, subsidiárias e de consumo",
+            "613": "Custo inventários vendidos e matérias consumidas-Activos biológicos",
+            "6210": "Subcontratos",
+            "622": "Serviços especializados",
+            "6221": "Serviços especializados-Trabalhos especializados",
+            "6222": "Serviços especializados-Publicidade e propaganda",
+            "6223": "Serviços especializados-Vigilância e segurança",
+            "6224": "Serviços especializados-Honorários",
+            "6225": "Serviços especializados-Comissões",
+            "6226": "Serviços especializados-Conservação e reparação",
+            "6227": "Serviços especializados-Comissões Bancárias",
+            "6228": "Serviços especializados-Outros",
+            "623": "Materiais",
+            "6241": "Energia e fluidos-Eletricidade",
+            "6242": "Energia e fluidos-Combustíveis",
+            "6243": "Energia e fluidos-Água",
+            "625": "Deslocações, estadas e transportes",
+            "626": "Serviços diversos",
+            "6251": "Deslocações, estadas e transportes-Deslocações e estadas",
+            "6252": "Deslocações, estadas e transportes-Transportes de pessoal",
+            "6253": "Deslocações, estadas e transportes-Viagens",
+            "6254": "Deslocações, estadas e transportes-Hospedagem",
+            "6255": "Deslocações, estadas e transportes-Outros",
+            "626": "Serviços diversos",
+            "6261": "Serviços diversos-Rendas e alugueres",
+            "6262": "Serviços diversos-Comunicação",
+            "6263": "Serviços diversos-Seguros",
+            "6264": "Serviços diversos-Royalties e licenças",
+            "6265": "Serviços diversos-Contencioso e notariado",
+            "6266": "Serviços diversos-Despesas de representação",
+            "6267": "Serviços diversos-Limpeza, higiene e conforto",
+            "631": "Gastos com o pessoal-Orgãos sociais",
+            "632": "Gastos com o pessoal-Pessoal",
+            "633": "Benefícios pós-emprego",
+            "634": "Indemnizações",
+            "635": "Encargos sobre remunerações",
+            "636": "Seguros de acidentes no trabalho e doenças profissionais",
+            "637": "Custos de accao social",
+            "638": "Outros gastos com o pessoal",
+            "641": "Gastos de depreciação e de amortização-Propriedades de investimento",
+            "642": "Gastos de depreciação e de amortização-Activos fixos tangíveis",
+            "643": "Gastos de depreciação e de amortização-Activos intangíveis",
+            "651": "Perdas por imparidade-Em dívidas a receber",
+            "652": "Perdas por imparidade-Em inventários",
+            "653": "Perdas por imparidade-Em investimentos financeiros",
+            "654": "Perdas por imparidade-Em propriedades de investimento",
+            "655": "Perdas por imparidade-Em activos fixos tangíveis",
+            "656": "Perdas por imparidade-Em activos intangíveis",
+            "657": "Perdas por imparidade-Em investimentos em curso",
+            "658": "Perdas por imparidade-Em activos não correntes detidos para venda",
+            "661": "Perdas por reduções de justo valor-Em instrumentos financeiros",
+            "662": "Perdas por reduções de justo valor-Em investimentos financeiros",
+            "663": "Perdas por reduções de justo valor-Em propriedades de investimento",
+            "664": "Perdas por reduções de justo valor-Em activos biológicos",
+            "671": "Provisões do exercício-Impostos",
+            "672": "Provisões do exercício-Garantias a clientes",
+            "68": "Outros gastos",
+            "681": "Outros gastos",
+            "6811": "Outros gastos-Donativos",
+            "6812": "Outros gastos-Multas e coimas",
+            "6813": "Outros gastos-Outras",
+            "688": "Outros gastos",
+            "6881": "Outros gastos-Resultados negativos de exercícios anteriores",
+            "6887": "Outros gastos-Outras",
+            "6888": "Outros gastos-Outras",
+            "69": "Gastos de financiamento",
+            "711": "Vendas-Mercadorias",
+            "712": "Vendas-Produtos acabados e intermédios",
+            "713": "Vendas-Subprodutos desperdicios residuos e refugos",
+            "716": "IVA das vendas com imposto incluído",
+            "717": "Devoluções de vendas",
+            "718": "Descontos e abatimentos em vendas",
+            "721": "Prestações de serviços-Serviço A",
+            "725": "Prestações de serviços-Serviços secundários",
+            "726": "IVA dos serviços com imposto incluído",
+            "727": "Prestação de serviços a designar",
+            "728": "Descontos e abatimentos",
+            "73": "Variações nos inventários de produção",
+            "74": "Trabalhos para a própria entidade",
+            "75": "Subsídios à exploração",
+            "76": "Reversões",
+            "781": "Rendimentos suplementares",
+            "782": "Descontos de pronto pagamento obtidos",
+            "783": "Recuperação de dividas a receber",
+            "784": "Ganhos em inventários",
+            "786": "Rend. e ganhos nos rest. inv. financeiros",
+            "787": "Rend. e ganhos em inv. não financeiros",
+            "7887": "Rend. e ganhos em inv. não financeiros-Outras",
+            "7888": "Rend. e ganhos em inv. não financeiros-Outras",
+            "788": "Outros",
+            "79": "Juros, dividendos e outros rendimentos similares"
+        };
+
+        let allData = null;
+        let filteredData = null;
+        let chartInstance = null;
+
+        function getDescritivoMapeado(conta) {
+            // Primeiro tenta encontrar no mapeamento com 4 dígitos (622x, 624x, 625x, 626x)
+            if (conta.length >= 4) {
+                const conta4dig = conta.substring(0, 4);
+                if (CONTAS_MAPEAMENTO[conta4dig]) {
+                    return CONTAS_MAPEAMENTO[conta4dig];
+                }
+            }
+            
+            // Se não encontrar, tenta com 3 dígitos
+            const conta3dig = conta.substring(0, 3);
+            if (CONTAS_MAPEAMENTO[conta3dig]) {
+                return CONTAS_MAPEAMENTO[conta3dig];
+            }
+            
+            // Se ainda não, tenta com 2 dígitos
+            const conta2dig = conta.substring(0, 2);
+            if (CONTAS_MAPEAMENTO[conta2dig]) {
+                return CONTAS_MAPEAMENTO[conta2dig];
+            }
+            
+            return `Conta ${conta}`;
+        }
+
+        function agruparConta(conta) {
+            // 4 dígitos para: 622, 624, 625, 626
+            if (conta.startsWith('622') || conta.startsWith('624') || conta.startsWith('625') || conta.startsWith('626')) {
+                return conta.substring(0, 4);
+            }
+            // 3 dígitos para o resto
+            return conta.substring(0, 3);
+        }
+
+        function formatEuro(value) {
+            return '€ ' + value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatEuroSigned(value) {
+            const sign = value < 0 ? '- ' : '';
+            return sign + formatEuro(Math.abs(value));
+        }
+
+        function loadXLSX(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Inicializar allData
+                    allData = {
+                        movimentos: [],
+                        contas: {},
+                        terceiros: {},
+                        timestamp: new Date().toLocaleString('pt-PT')
+                    };
+                    
+                    // Extrair data de última submissão (A1)
+                    const dataSubmissao = worksheet['A1']?.v || new Date().toLocaleDateString('pt-PT');
+                    const dataFormatada = typeof dataSubmissao === 'number' ? 
+                        new Date((dataSubmissao - 25569) * 86400 * 1000).toLocaleDateString('pt-PT') : 
+                        new Date(dataSubmissao).toLocaleDateString('pt-PT');
+                    
+                    allData.dataSubmissao = dataFormatada;
+                    document.getElementById('dataUltimaAtualizacao').textContent = `Última atualização: ${dataFormatada}`;
+                    
+                    // Extrair nome da empresa de A2
+                    const nomeEmpresa = worksheet['A2']?.v || 'Empresa';
+                    document.getElementById('nomEmpresa').textContent = nomeEmpresa;
+                    
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 'A', defval: '', range: 7 });
+                    parseData(rawData);
+                } catch (error) {
+                    document.getElementById('statusText').textContent = '❌ Erro ao ler Excel: ' + error.message;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseData(rawData) {
+            try {
+                allData = {
+                    movimentos: [],
+                    contas: {},
+                    terceiros: {},
+                    timestamp: new Date().toLocaleString('pt-PT')
+                };
+
+                rawData.forEach((row) => {
+                    const contaLonga = row.A ? String(row.A).trim() : '';
+                    if (!contaLonga) return;
+                    
+                    // Aceitar contas 1x (bancos), 21x (clientes), 22x (fornecedores), 6x (gastos), 7x (rendimentos)
+                    const primeiroDigito = contaLonga.substring(0, 1);
+                    const doisPrimeiros = contaLonga.substring(0, 2);
+                    
+                    if (!(['1', '6', '7'].includes(primeiroDigito) || ['21', '22'].includes(doisPrimeiros))) return;
+
+                    // Determinar a conta SNC apropriada
+                    let contaSNC;
+                    if (primeiroDigito === '1') {
+                        contaSNC = primeiroDigito; // Contas 1x
+                    } else if (doisPrimeiros === '21') {
+                        contaSNC = '21'; // Clientes
+                    } else if (doisPrimeiros === '22') {
+                        contaSNC = '22'; // Fornecedores
+                    } else {
+                        // Para 6x e 7x, usar a lógica de agrupamento
+                        contaSNC = contaLonga.length >= 3 ? contaLonga.substring(0, 3) : contaLonga;
+                    }
+
+                    const movimento = {
+                        contaOriginal: contaLonga, // Armazenar conta original
+                        conta: contaSNC,
+                        descritivo: row.B ? String(row.B).trim() : '',
+                        data: row.C ? String(row.C).trim() : '',
+                        movimento: parseFloat(row.M) || 0,
+                        terceiro: row.P ? String(row.P).trim() : '',
+                        nif: row.Q ? String(row.Q).trim() : '',
+                        tipoLancamento: row.D ? String(row.D).trim() : '',
+                        docContabilidade: row.E ? String(row.E).trim() : '',
+                        diario: row.F ? String(row.F).trim() : '',
+                        noDiario: row.G ? String(row.G).trim() : '',
+                        descricao: row.H ? String(row.H).trim() : ''
+                    };
+
+                    if (movimento.data && !movimento.data.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        try {
+                            const dateObj = new Date(movimento.data);
+                            movimento.data = dateObj.toISOString().split('T')[0];
+                        } catch (e) {}
+                    }
+
+                    allData.movimentos.push(movimento);
+
+                    if (!allData.contas[movimento.conta]) {
+                        allData.contas[movimento.conta] = {
+                            descritivo: getDescritivoMapeado(movimento.conta),
+                            totalMovimento: 0,
+                            movimentos: 0
+                        };
+                    }
+                    allData.contas[movimento.conta].totalMovimento += movimento.movimento;
+                    allData.contas[movimento.conta].movimentos += 1;
+
+                    if (movimento.terceiro && movimento.nif) {
+                        if (!allData.terceiros[movimento.nif]) {
+                            allData.terceiros[movimento.nif] = {
+                                nome: movimento.terceiro,
+                                contas: new Set(),
+                                movimentos: 0
+                            };
+                        }
+                        allData.terceiros[movimento.nif].contas.add(movimento.conta);
+                        allData.terceiros[movimento.nif].movimentos += 1;
+                    }
+                });
+
+                filteredData = JSON.parse(JSON.stringify(allData));
+                renderDashboard();
+                document.getElementById('statusText').textContent = '✅ ' + allData.movimentos.length + ' movimentos processados';
+            } catch (error) {
+                document.getElementById('statusText').textContent = '❌ Erro: ' + error.message;
+            }
+        }
+
+        function filterByMonth() {
+            const month = document.getElementById('monthSelect').value;
+            
+            if (!allData) return;
+
+            if (!month) {
+                filteredData = JSON.parse(JSON.stringify(allData));
+                document.getElementById('headerDate').textContent = 'Todos os Dados';
+            } else {
+                filteredData = {
+                    movimentos: allData.movimentos.filter(m => m.data.startsWith(month)),
+                    contas: {},
+                    terceiros: {},
+                    timestamp: allData.timestamp
+                };
+
+                filteredData.movimentos.forEach(mov => {
+                    if (!filteredData.contas[mov.conta]) {
+                        filteredData.contas[mov.conta] = {
+                            descritivo: getDescritivoMapeado(mov.conta),
+                            totalMovimento: 0,
+                            movimentos: 0
+                        };
+                    }
+                    filteredData.contas[mov.conta].totalMovimento += mov.movimento;
+                    filteredData.contas[mov.conta].movimentos += 1;
+                });
+
+                const monthName = new Date(month + '-01').toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+                document.getElementById('headerDate').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+            }
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            if (!filteredData) return;
+
+            let totalRendimentos = 0;
+            let totalGastos = 0;
+
+            Object.entries(filteredData.contas || {}).forEach(([conta, dados]) => {
+                const conta1char = conta.substring(0, 1);
+                
+                if (conta1char === '7') {
+                    totalRendimentos += Math.abs(dados.totalMovimento);
+                } else if (conta1char === '6') {
+                    totalGastos += dados.totalMovimento;
+                }
+            });
+
+            const resultado = totalRendimentos - totalGastos;
+            const margem = totalRendimentos !== 0 ? (resultado / totalRendimentos) * 100 : 0;
+
+            document.getElementById('totalRendimentos').textContent = formatEuro(totalRendimentos);
+            document.getElementById('totalGastos').textContent = formatEuro(totalGastos);
+            document.getElementById('resultadoOperacional').textContent = formatEuro(resultado);
+            document.getElementById('margem').textContent = margem.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+
+            renderMapaExploacao(totalRendimentos, totalGastos, resultado);
+            updateContasTable();
+            updateTabelaClientes();
+            updateTabelaFornecedores();
+            updateTabelaBancarias();
+            updateChart();
+        }
+
+        function renderMapaExploacao(totalRend, totalGast, resultado) {
+            // RENDIMENTOS - Nível 1 (3 dígitos)
+            let rendimentosHtml = '';
+            const rendimentos3dig = {};
+
+            (filteredData.movimentos || []).forEach(mov => {
+                if (mov.conta.startsWith('7')) {
+                    const contaOriginal = mov.contaOriginal || mov.conta;
+                    const conta3dig = contaOriginal.substring(0, 3);
+                    if (!rendimentos3dig[conta3dig]) {
+                        rendimentos3dig[conta3dig] = { 
+                            valor: 0, 
+                            descritivo: getDescritivoMapeado(conta3dig)
+                        };
+                    }
+                    rendimentos3dig[conta3dig].valor += Math.abs(mov.movimento);
+                }
+            });
+
+            Object.keys(rendimentos3dig).sort().forEach(conta3dig => {
+                const valor = rendimentos3dig[conta3dig].valor;
+                const descritivo = rendimentos3dig[conta3dig].descritivo;
+                
+                if (valor > 0.001) {
+                    rendimentosHtml += `<div class="mapa-row" onclick="mostrar4Digitos('7', '${conta3dig}')">
+                        <div class="mapa-conta">
+                            <div class="mapa-conta-num">${conta3dig}</div>
+                            <div class="mapa-conta-desc">${descritivo}</div>
+                        </div>
+                        <div class="mapa-valor">${formatEuro(valor)}</div>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('rendimentosSection').innerHTML = rendimentosHtml || '<div style="padding: 12px; color: #a0b4c7;">Sem rendimentos</div>';
+            document.getElementById('totalRendimentosRow').textContent = formatEuro(totalRend);
+
+            // GASTOS - Nível 1 (3 dígitos)
+            let gastosHtml = '';
+            const gastos3dig = {};
+
+            (filteredData.movimentos || []).forEach(mov => {
+                if (mov.conta.startsWith('6')) {
+                    const contaOriginal = mov.contaOriginal || mov.conta;
+                    const conta3dig = contaOriginal.substring(0, 3);
+                    if (!gastos3dig[conta3dig]) {
+                        gastos3dig[conta3dig] = { 
+                            valor: 0, 
+                            descritivo: getDescritivoMapeado(conta3dig)
+                        };
+                    }
+                    gastos3dig[conta3dig].valor += mov.movimento;
+                }
+            });
+
+            Object.keys(gastos3dig).sort().forEach(conta3dig => {
+                const valor = gastos3dig[conta3dig].valor;
+                const descritivo = gastos3dig[conta3dig].descritivo;
+                
+                if (valor > 0.001) {
+                    gastosHtml += `<div class="mapa-row" onclick="mostrar4Digitos('6', '${conta3dig}')">
+                        <div class="mapa-conta">
+                            <div class="mapa-conta-num">${conta3dig}</div>
+                            <div class="mapa-conta-desc">${descritivo}</div>
+                        </div>
+                        <div class="mapa-valor">${formatEuro(valor)}</div>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('gastosSection').innerHTML = gastosHtml || '<div style="padding: 12px; color: #a0b4c7;">Sem gastos</div>';
+            document.getElementById('totalGastosRow').textContent = formatEuro(totalGast);
+
+            const resultRow = document.getElementById('resultadoRow');
+            resultRow.classList.remove('negative');
+            if (resultado < 0) {
+                resultRow.classList.add('negative');
+            }
+            document.getElementById('resultadoValor').textContent = formatEuroSigned(resultado);
+        }
+
+        // Nível 2: Mostrar contas de 4 dígitos
+        function mostrar4Digitos(tipo, conta3dig) {
+            const contas4dig = {};
+
+            (filteredData.movimentos || []).forEach(mov => {
+                const contaOriginal = mov.contaOriginal || mov.conta;
+                if (mov.conta.substring(0, 1) === tipo && contaOriginal.substring(0, 3) === conta3dig) {
+                    const conta4dig = contaOriginal.substring(0, 4);
+                    
+                    if (!contas4dig[conta4dig]) {
+                        contas4dig[conta4dig] = { 
+                            valor: 0, 
+                            descritivo: getDescritivoMapeado(conta4dig)
+                        };
+                    }
+                    
+                    if (tipo === '7') {
+                        contas4dig[conta4dig].valor += Math.abs(mov.movimento);
+                    } else {
+                        contas4dig[conta4dig].valor += mov.movimento;
+                    }
+                }
+            });
+
+            // Criar modal com contas de 4 dígitos
+            let html = '<table style="width: 100%; border-collapse: collapse; background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border);">';
+            html += '<thead><tr style="background-color: #0EA5A0; color: white;"><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">Conta</th><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">Descritivo</th><th style="padding: 12px; text-align: right; border: 1px solid var(--dark-border); font-weight: bold;">Saldo</th></tr></thead>';
+            html += '<tbody>';
+
+            let totalContas = 0;
+            Object.keys(contas4dig).sort().forEach(conta4dig => {
+                const valor = contas4dig[conta4dig].valor;
+                if (valor > 0.001) {
+                    const descritivo = getDescritivoMapeado(conta4dig);
+                    html += `<tr style="cursor: pointer; border: 1px solid var(--dark-border); color: var(--text-light);" onclick="mostrarDetalhes('${conta4dig}', '${conta3dig}', '${tipo}')">
+                        <td style="padding: 12px; border: 1px solid var(--dark-border);"><strong>${conta4dig}</strong></td>
+                        <td style="padding: 12px; border: 1px solid var(--dark-border);">${descritivo}</td>
+                        <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(valor)}</td>
+                    </tr>`;
+                    totalContas += valor;
+                }
+            });
+
+            html += `<tr style="background-color: rgba(14, 165, 160, 0.2); font-weight: bold; border: 2px solid #0EA5A0; color: var(--text-light);">
+                <td colspan="2" style="padding: 12px; border: 1px solid var(--dark-border);">TOTAL</td>
+                <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(totalContas)}</td>
+            </tr>`;
+            html += '</tbody></table>';
+            html += `<div style="margin-top: 15px; text-align: center;"><button onclick="closeModal(); renderDashboard();" style="padding: 10px 20px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">← Voltar</button></div>`;
+
+            document.getElementById('modalTitle').textContent = `Contas de 4 Dígitos - ${conta3dig}`;
+            document.getElementById('modalTable').innerHTML = html;
+            document.getElementById('detalheModal').style.display = 'block';
+        }
+
+        // Nível 3: Mostrar detalhes (terceiros agrupados)
+        function mostrarDetalhes(conta4dig, conta3dig, tipo) {
+            const terceiros = {};
+
+            (filteredData.movimentos || []).forEach(mov => {
+                const contaOriginal = mov.contaOriginal || mov.conta;
+                // Extrair os 4 primeiros dígitos da conta original
+                const conta4digReal = contaOriginal.substring(0, 4);
+                
+                // Se a conta pedida for 4 dígitos, procurar exatamente essa
+                // Se for 3 dígitos (nunca acontece aqui), procurar o padrão
+                if (conta4digReal === conta4dig) {
+                    const nomeTerceiro = mov.terceiro || '-';
+                    
+                    if (!terceiros[nomeTerceiro]) {
+                        terceiros[nomeTerceiro] = { 
+                            valor: 0,
+                            nif: mov.nif || '-'
+                        };
+                    }
+                    
+                    const conta1char = mov.conta.substring(0, 1);
+                    const valorExibir = conta1char === '7' ? Math.abs(mov.movimento) : mov.movimento;
+                    terceiros[nomeTerceiro].valor += valorExibir;
+                }
+            });
+            
+            document.getElementById('modalTitle').textContent = `Terceiros - Conta ${conta4dig}`;
+
+            let html = '<table style="width: 100%; border-collapse: collapse; background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border);">';
+            html += '<thead><tr style="background-color: #0EA5A0; color: white;"><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">Terceiro</th><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">NIF</th><th style="padding: 12px; text-align: right; border: 1px solid var(--dark-border); font-weight: bold;">Saldo</th></tr></thead>';
+            html += '<tbody style="color: var(--text-light);">';
+
+            let totalTerceiros = 0;
+            Object.keys(terceiros).sort().forEach(nomeTerceiro => {
+                const valor = terceiros[nomeTerceiro].valor;
+                const nif = terceiros[nomeTerceiro].nif;
+                if (Math.abs(valor) > 0.001) {
+                    html += `<tr style="cursor: pointer; border: 1px solid var(--dark-border);" onclick="mostrarMovimentosTerceiro('${conta4dig}', '${nomeTerceiro.replace(/'/g, "\\'")}', '${conta3dig}', '${tipo}')">
+                        <td style="padding: 12px; border: 1px solid var(--dark-border);"><strong>${nomeTerceiro}</strong></td>
+                        <td style="padding: 12px; border: 1px solid var(--dark-border);">${nif}</td>
+                        <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(valor)}</td>
+                    </tr>`;
+                    totalTerceiros += valor;
+                }
+            });
+
+            if (Object.keys(terceiros).length === 0) {
+                html += '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem terceiros</td></tr>';
+            } else {
+                html += `<tr style="background-color: rgba(14, 165, 160, 0.2); font-weight: bold; border: 2px solid #0EA5A0; color: var(--text-light);">
+                    <td colspan="2" style="padding: 12px; border: 1px solid var(--dark-border);">TOTAL</td>
+                    <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(totalTerceiros)}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table>';
+            html += `<div style="margin-top: 15px; text-align: center;"><button onclick="mostrar4Digitos('${tipo}', '${conta3dig}')" style="padding: 10px 20px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">← Voltar</button></div>`;
+            
+            document.getElementById('modalTable').innerHTML = html;
+            document.getElementById('detalheModal').style.display = 'block';
+        }
+
+        // Nível 4: Mostrar movimentos agrupados por terceiro
+        function mostrarMovimentosTerceiro(conta4dig, nomeTerceiro, conta3dig, tipo) {
+            const movimentos = (filteredData.movimentos || [])
+                .filter(mov => {
+                    const contaOriginal = mov.contaOriginal || mov.conta;
+                    const terceiro = mov.terceiro || '-';
+                    return contaOriginal.substring(0, 4) === conta4dig && terceiro === nomeTerceiro;
+                })
+                .filter(m => Math.abs(m.movimento) > 0.00 && !m.descritivo.toLowerCase().includes('saldo inicial'))
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            document.getElementById('modalTitle').textContent = `Movimentos - ${nomeTerceiro} (${conta4dig})`;
+
+            let html = '<table style="width: 100%; border-collapse: collapse; background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border);">';
+            html += '<thead><tr style="background-color: #0EA5A0; color: white;"><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">Data</th><th style="padding: 12px; text-align: left; border: 1px solid var(--dark-border); font-weight: bold;">Descritivo</th><th style="padding: 12px; text-align: right; border: 1px solid var(--dark-border); font-weight: bold;">Saldo</th></tr></thead>';
+            html += '<tbody style="color: var(--text-light);">';
+
+            let totalMovimentos = 0;
+            movimentos.forEach(mov => {
+                const conta1char = mov.conta.substring(0, 1);
+                const valorExibir = conta1char === '7' ? Math.abs(mov.movimento) : mov.movimento;
+                totalMovimentos += valorExibir;
+                html += `<tr style="border: 1px solid var(--dark-border);">
+                    <td style="padding: 12px; border: 1px solid var(--dark-border);">${mov.data}</td>
+                    <td style="padding: 12px; border: 1px solid var(--dark-border);">${mov.descritivo}</td>
+                    <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(valorExibir)}</td>
+                </tr>`;
+            });
+
+            if (movimentos.length === 0) {
+                html += '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem movimentos</td></tr>';
+            } else {
+                html += `<tr style="background-color: rgba(14, 165, 160, 0.2); font-weight: bold; border: 2px solid #0EA5A0; color: var(--text-light);">
+                    <td colspan="2" style="padding: 12px; border: 1px solid var(--dark-border);">TOTAL</td>
+                    <td style="padding: 12px; border: 1px solid var(--dark-border); text-align: right;">${formatEuro(totalMovimentos)}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table>';
+            html += `<div style="margin-top: 15px; text-align: center;"><button onclick="mostrarDetalhes('${conta4dig}', '${conta3dig}', '${tipo}')" style="padding: 10px 20px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">← Voltar</button></div>`;
+            
+            document.getElementById('modalTable').innerHTML = html;
+            document.getElementById('detalheModal').style.display = 'block';
+        }
+
+        function updateContasTable() {
+            let html = '';
+            const contas = Object.entries(filteredData.contas || {}).sort((a, b) => a[0].localeCompare(b[0]));
+
+            contas.forEach(([conta, dados]) => {
+                const conta1char = conta.substring(0, 1);
+                const valorExibir = conta1char === '7' ? Math.abs(dados.totalMovimento) : dados.totalMovimento;
+                const descritivo = getDescritivoMapeado(conta);
+                html += `<tr><td><strong>${conta}</strong></td><td>${descritivo}</td><td>${formatEuro(valorExibir)}</td></tr>`;
+            });
+
+            document.getElementById('contasTable').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px;">Sem dados</td></tr>';
+        }
+
+        function showAba(abaName) {
+            // Esconder todas as abas
+            document.getElementById('abaClientes').style.display = 'none';
+            document.getElementById('abaFornecedores').style.display = 'none';
+            document.getElementById('abaBancarias').style.display = 'none';
+
+            // Remover estilo ativo de todos os botões
+            document.getElementById('btnClientes').style.background = 'transparent';
+            document.getElementById('btnClientes').style.color = 'var(--text-light)';
+            document.getElementById('btnClientes').style.border = '2px solid var(--dark-border)';
+            
+            document.getElementById('btnFornecedores').style.background = 'transparent';
+            document.getElementById('btnFornecedores').style.color = 'var(--text-light)';
+            document.getElementById('btnFornecedores').style.border = '2px solid var(--dark-border)';
+            
+            document.getElementById('btnBancarias').style.background = 'transparent';
+            document.getElementById('btnBancarias').style.color = 'var(--text-light)';
+            document.getElementById('btnBancarias').style.border = '2px solid var(--dark-border)';
+
+            // Mostrar aba selecionada
+            if (abaName === 'clientes') {
+                document.getElementById('abaClientes').style.display = 'block';
+                document.getElementById('btnClientes').style.background = 'linear-gradient(135deg, var(--accent-teal), #0d8f8a)';
+                document.getElementById('btnClientes').style.color = 'white';
+                document.getElementById('btnClientes').style.border = 'none';
+                updateTabelaClientes();
+            } else if (abaName === 'fornecedores') {
+                document.getElementById('abaFornecedores').style.display = 'block';
+                document.getElementById('btnFornecedores').style.background = 'linear-gradient(135deg, var(--accent-teal), #0d8f8a)';
+                document.getElementById('btnFornecedores').style.color = 'white';
+                document.getElementById('btnFornecedores').style.border = 'none';
+                updateTabelaFornecedores();
+            } else if (abaName === 'bancarias') {
+                document.getElementById('abaBancarias').style.display = 'block';
+                document.getElementById('btnBancarias').style.background = 'linear-gradient(135deg, var(--accent-teal), #0d8f8a)';
+                document.getElementById('btnBancarias').style.color = 'white';
+                document.getElementById('btnBancarias').style.border = 'none';
+                updateTabelaBancarias();
+            }
+        }
+
+        function updateTabelaClientes() {
+            let html = '';
+            let totalClientes = 0;
+            const terceirosClientes = {};
+
+            // Atualizar nota com data
+            if (allData.dataSubmissao) {
+                document.getElementById('notaClientes').textContent = `Valores à data de ${allData.dataSubmissao}`;
+            }
+
+            // Agrupar por terceiro (nif)
+            (filteredData.movimentos || []).forEach(mov => {
+                if (mov.conta.startsWith('21') && mov.nif && mov.terceiro) {
+                    if (!terceirosClientes[mov.nif]) {
+                        terceirosClientes[mov.nif] = {
+                            nome: mov.terceiro,
+                            saldo: 0
+                        };
+                    }
+                    terceirosClientes[mov.nif].saldo += mov.movimento;
+                }
+            });
+
+            // Ordenar por NIF e filtrar saldos 0
+            Object.entries(terceirosClientes).sort((a, b) => a[0].localeCompare(b[0])).forEach(([nif, dados]) => {
+                // Ocultar se saldo é 0
+                if (Math.abs(dados.saldo) < 0.01) return;
+                
+                html += `<tr><td><strong>${nif}</strong></td><td>${dados.nome}</td><td>${formatEuro(dados.saldo)}</td></tr>`;
+                totalClientes += dados.saldo;
+            });
+
+            document.getElementById('tabelaClientes').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem dados</td></tr>';
+            document.getElementById('totalClientes').textContent = formatEuro(totalClientes);
+        }
+
+        function updateTabelaFornecedores() {
+            let html = '';
+            let totalFornecedores = 0;
+            const terceirosFornecedores = {};
+
+            // Atualizar nota com data
+            if (allData.dataSubmissao) {
+                document.getElementById('notaFornecedores').textContent = `Valores à data de ${allData.dataSubmissao}`;
+            }
+
+            // Agrupar por terceiro (nif)
+            (filteredData.movimentos || []).forEach(mov => {
+                if (mov.conta.startsWith('22') && mov.nif && mov.terceiro) {
+                    if (!terceirosFornecedores[mov.nif]) {
+                        terceirosFornecedores[mov.nif] = {
+                            nome: mov.terceiro,
+                            saldo: 0
+                        };
+                    }
+                    terceirosFornecedores[mov.nif].saldo += mov.movimento;
+                }
+            });
+
+            // Ordenar por NIF e filtrar saldos 0
+            Object.entries(terceirosFornecedores).sort((a, b) => a[0].localeCompare(b[0])).forEach(([nif, dados]) => {
+                // Ocultar se saldo é 0
+                if (Math.abs(dados.saldo) < 0.01) return;
+                
+                // Mostrar negativo como positivo
+                const saldoExibir = Math.abs(dados.saldo);
+                html += `<tr><td><strong>${nif}</strong></td><td>${dados.nome}</td><td>${formatEuro(saldoExibir)}</td></tr>`;
+                totalFornecedores += saldoExibir;
+            });
+
+            document.getElementById('tabelaFornecedores').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem dados</td></tr>';
+            document.getElementById('totalFornecedores').textContent = formatEuro(totalFornecedores);
+        }
+
+        function updateTabelaBancarias() {
+            let html = '';
+            let totalBancarias = 0;
+            const contasBancarias = {};
+
+            // Atualizar nota com data
+            if (allData.dataSubmissao) {
+                document.getElementById('notaBancarias').textContent = `Valores à data de ${allData.dataSubmissao}`;
+            }
+
+            // Agrupar por conta bancária completa original (12001, 12002, 12003, etc.)
+            (allData.movimentos || []).forEach(mov => {
+                if (mov.conta.startsWith('1')) {
+                    const contaOriginal = mov.contaOriginal || mov.conta;
+                    
+                    if (!contasBancarias[contaOriginal]) {
+                        contasBancarias[contaOriginal] = {
+                            descritivo: mov.descritivo,
+                            saldo: 0
+                        };
+                    }
+                    contasBancarias[contaOriginal].saldo += mov.movimento;
+                }
+            });
+
+            // Ordenar por conta e filtrar saldos 0
+            Object.entries(contasBancarias).sort((a, b) => a[0].localeCompare(b[0])).forEach(([conta, dados]) => {
+                // Ocultar se saldo é 0
+                if (Math.abs(dados.saldo) < 0.01) return;
+                
+                html += `<tr><td><strong>${conta}</strong></td><td>${dados.descritivo}</td><td>${formatEuro(dados.saldo)}</td></tr>`;
+                totalBancarias += dados.saldo;
+            });
+
+            document.getElementById('tabelaBancarias').innerHTML = html || '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #a0b4c7;">Sem dados</td></tr>';
+            document.getElementById('totalBancarias').textContent = formatEuro(totalBancarias);
+        }
+
+        function updateChart() {
+            if (!allData || !allData.movimentos) return;
+
+            const months = {};
+            allData.movimentos.forEach(mov => {
+                const month = mov.data.substring(0, 7);
+                if (!months[month]) {
+                    months[month] = { rendimentos: 0, gastos: 0 };
+                }
+
+                const conta1char = mov.conta.substring(0, 1);
+                if (conta1char === '7') {
+                    months[month].rendimentos += Math.abs(mov.movimento);
+                } else if (conta1char === '6') {
+                    months[month].gastos += mov.movimento;
+                }
+            });
+
+            const sortedMonths = Object.keys(months).sort();
+            const resultados = sortedMonths.map(m => months[m].rendimentos - months[m].gastos);
+
+            const ctx = document.getElementById('resultadoChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedMonths,
+                    datasets: [{
+                        label: 'Resultado Operacional',
+                        data: resultados,
+                        backgroundColor: resultados.map(r => r >= 0 ? '#10b981' : '#ef4444'),
+                        borderColor: resultados.map(r => r >= 0 ? '#059669' : '#dc2626'),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#E8F0F3', font: { size: 12 } } } },
+                    scales: {
+                        x: { ticks: { color: '#a0b4c7' }, grid: { color: '#2A3F52' } },
+                        y: { ticks: { color: '#a0b4c7' }, grid: { color: '#2A3F52' } }
+                    }
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('detalheModal').style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            const modal = document.getElementById('detalheModal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // FUNÇÕES DE EXPORTAÇÃO
+        function exportarExcel(tableId, nomeArquivo) {
+            const wb = XLSX.utils.book_new();
+            
+            // Aba 1: Resumo
+            const resumoData = [];
+            const empresa = document.getElementById('nomEmpresa').textContent;
+            const data = document.getElementById('dataUltimaAtualizacao').textContent;
+            
+            resumoData.push(['Dashboard Financeiro - ACContas']);
+            resumoData.push(['Empresa:', empresa]);
+            resumoData.push([data]);
+            resumoData.push([]);
+            
+            // Adicionar tabela resumida
+            const tabela = document.getElementById(tableId);
+            const linhasTabela = Array.from(tabela.querySelectorAll('tr'));
+            
+            // Adicionar cabeçalhos
+            const cabeçalhos = Array.from(linhasTabela[0].querySelectorAll('th')).map(th => th.textContent);
+            resumoData.push(cabeçalhos);
+            
+            // Adicionar dados
+            for (let i = 1; i < linhasTabela.length; i++) {
+                const colunas = Array.from(linhasTabela[i].querySelectorAll('td')).map(td => td.textContent);
+                resumoData.push(colunas);
+            }
+            
+            // Adicionar total
+            const totalElement = document.getElementById('total' + tableId.charAt(0).toUpperCase() + tableId.slice(1));
+            if (totalElement) {
+                const totalColunas = Array(cabeçalhos.length);
+                totalColunas[cabeçalhos.length - 2] = 'TOTAL';
+                totalColunas[cabeçalhos.length - 1] = totalElement.textContent;
+                resumoData.push(totalColunas);
+            }
+            
+            const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+            XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+            
+            // Aba 2: Movimentos detalhados
+            const movimentosData = [];
+            movimentosData.push(['Movimentos Detalhados']);
+            movimentosData.push(['Data', 'Conta', 'Tipo Lançamento', 'Doc. Contabilidade', 'Diário', 'Nº Diário', 'Descritivo', 'Terceiro', 'Saldo']);
+            
+            // Filtrar movimentos por tipo de tabela
+            let filtroContas = [];
+            if (tableId === 'tabelaClientes') {
+                filtroContas = ['21'];
+            } else if (tableId === 'tabelaFornecedores') {
+                filtroContas = ['22'];
+            } else if (tableId === 'tabelaBancarias') {
+                filtroContas = ['1'];
+            }
+            
+            const movimentosFiltrados = allData.movimentos.filter(mov => 
+                filtroContas.some(fc => mov.conta.startsWith(fc)) && Math.abs(mov.movimento) >= 0.01
+            ).sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            movimentosFiltrados.forEach(mov => {
+                const valorExibir = mov.conta.startsWith('7') ? Math.abs(mov.movimento) : 
+                                   (tableId === 'tabelaFornecedores' ? Math.abs(mov.movimento) : mov.movimento);
+                
+                // Procurar dados adicionais no rawData (será preciso armazenar no parseData)
+                const tipoLancamento = mov.tipoLancamento || '';
+                const docContabilidade = mov.docContabilidade || '';
+                const diario = mov.diario || '';
+                const noDiario = mov.noDiario || '';
+                
+                movimentosData.push([
+                    mov.data,
+                    mov.contaOriginal || mov.conta,
+                    tipoLancamento,
+                    docContabilidade,
+                    diario,
+                    noDiario,
+                    mov.descritivo,
+                    mov.terceiro || '',
+                    valorExibir
+                ]);
+            });
+            
+            const wsMovimentos = XLSX.utils.aoa_to_sheet(movimentosData);
+            XLSX.utils.book_append_sheet(wb, wsMovimentos, 'Movimentos');
+            
+            // Baixar arquivo
+            XLSX.writeFile(wb, `${nomeArquivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function exportarPDF(tableId, nomeArquivo) {
+            const empresa = document.getElementById('nomEmpresa').textContent;
+            const data = document.getElementById('dataUltimaAtualizacao').textContent;
+            
+            // Tabela resumida
+            const tabela = document.getElementById(tableId);
+            const tabelaClone = tabela.cloneNode(true);
+            
+            // Adicionar linha de total
+            const totalElement = document.getElementById('total' + tableId.charAt(0).toUpperCase() + tableId.slice(1));
+            if (totalElement) {
+                const linhaTotal = document.createElement('tr');
+                linhaTotal.style.fontWeight = 'bold';
+                linhaTotal.style.backgroundColor = '#e0f2f1';
+                
+                const colunas = tabelaClone.querySelectorAll('tbody tr');
+                const numColunas = colunas.length > 0 ? colunas[0].querySelectorAll('td').length : 3;
+                
+                const celula = document.createElement('td');
+                celula.colSpan = numColunas - 1;
+                celula.textContent = 'TOTAL';
+                celula.style.color = '#000000';
+                linhaTotal.appendChild(celula);
+                
+                const celulaDados = document.createElement('td');
+                celulaDados.textContent = totalElement.textContent;
+                celulaDados.style.fontWeight = 'bold';
+                celulaDados.style.color = '#000000';
+                linhaTotal.appendChild(celulaDados);
+                
+                tabelaClone.appendChild(linhaTotal);
+            }
+            
+            // Preparar dados de movimentos
+            let filtroContas = [];
+            let titulo = '';
+            if (tableId === 'tabelaClientes') {
+                filtroContas = ['21'];
+                titulo = 'Saldo em Aberto Clientes';
+            } else if (tableId === 'tabelaFornecedores') {
+                filtroContas = ['22'];
+                titulo = 'Saldo em Aberto Fornecedores';
+            } else if (tableId === 'tabelaBancarias') {
+                filtroContas = ['1'];
+                titulo = 'Saldo Contas Bancárias';
+            }
+            
+            const movimentosFiltrados = allData.movimentos.filter(mov => 
+                filtroContas.some(fc => mov.conta.startsWith(fc)) && Math.abs(mov.movimento) >= 0.01
+            ).sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            let htmlMovimentos = '<h3 style="margin-top: 30px; color: #0EA5A0; page-break-before: always;">Movimentos Detalhados</h3>';
+            htmlMovimentos += '<table style="width: 100%; border-collapse: collapse; font-size: 11px;">';
+            htmlMovimentos += '<thead><tr style="background-color: #0EA5A0; color: white;">';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Data</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Conta</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tipo Lançamento</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Doc. Contab.</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Diário</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Nº Diário</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Descritivo</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Terceiro</th>';
+            htmlMovimentos += '<th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Saldo</th>';
+            htmlMovimentos += '</tr></thead><tbody>';
+            
+            movimentosFiltrados.forEach(mov => {
+                const valorExibir = mov.conta.startsWith('7') ? Math.abs(mov.movimento) : 
+                                   (tableId === 'tabelaFornecedores' ? Math.abs(mov.movimento) : mov.movimento);
+                const valorFormatado = '€ ' + valorExibir.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                
+                const tipoLancamento = mov.tipoLancamento || '';
+                const docContabilidade = mov.docContabilidade || '';
+                const diario = mov.diario || '';
+                const noDiario = mov.noDiario || '';
+                
+                htmlMovimentos += '<tr style="border: 1px solid #ddd; color: #000000;">';
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${mov.data}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${mov.contaOriginal || mov.conta}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${tipoLancamento}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${docContabilidade}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${diario}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${noDiario}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${mov.descritivo}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px;">${mov.terceiro || ''}</td>`;
+                htmlMovimentos += `<td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${valorFormatado}</td>`;
+                htmlMovimentos += '</tr>';
+            });
+            
+            htmlMovimentos += '</tbody></table>';
+            
+            // Criar HTML para PDF
+            const htmlContent = `
+                <style>
+                    * { color: #000000; }
+                    body { font-family: Arial, sans-serif; color: #000000; }
+                    h2 { color: #0EA5A0; border-bottom: 2px solid #0EA5A0; padding-bottom: 10px; }
+                    h3 { color: #0EA5A0; margin-top: 0px; page-break-before: always; }
+                    h3:first-of-type { page-break-before: avoid; }
+                    p { color: #000000; margin: 5px 0; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th { background-color: #0EA5A0; color: white; padding: 10px; text-align: left; border: 1px solid #ddd; }
+                    td { padding: 10px; border: 1px solid #ddd; color: #000000; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    .header { margin-bottom: 20px; }
+                    .header p { margin: 5px 0; color: #000000; }
+                </style>
+                <h2>${titulo} - ACContas</h2>
+                <div class="header">
+                    <p><strong>Empresa:</strong> ${empresa}</p>
+                    <p><strong>${data}</strong></p>
+                </div>
+                <h3>Resumo</h3>
+                ${tabelaClone.outerHTML}
+                ${htmlMovimentos}
+            `;
+            
+            // Configurações do PDF
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `${nomeArquivo}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+            
+            // Gerar PDF
+            html2pdf().set(opt).from(htmlContent).save();
+        }
+
+        // FUNÇÕES DE EXPORTAÇÃO DO MAPA DE EXPLORAÇÃO
+        function gerarDadosMapaPorMes() {
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const dadosMeses = {};
+            
+            // Inicializar estrutura de meses
+            meses.forEach((mes, idx) => {
+                dadosMeses[idx] = {
+                    rendimentos: {},
+                    gastos: {},
+                    total: { rendimentos: 0, gastos: 0 }
+                };
+            });
+            
+            // Processar movimentos por mês
+            allData.movimentos.forEach(mov => {
+                const data = new Date(mov.data);
+                const mes = data.getMonth();
+                const conta = mov.conta;
+                
+                if (mes >= 0 && mes < 12) {
+                    if (conta.startsWith('7')) {
+                        const contaAgrupada = agruparConta(conta);
+                        if (!dadosMeses[mes].rendimentos[contaAgrupada]) {
+                            dadosMeses[mes].rendimentos[contaAgrupada] = 0;
+                        }
+                        dadosMeses[mes].rendimentos[contaAgrupada] += Math.abs(mov.movimento);
+                        dadosMeses[mes].total.rendimentos += Math.abs(mov.movimento);
+                    } else if (conta.startsWith('6')) {
+                        const contaAgrupada = agruparConta(conta);
+                        if (!dadosMeses[mes].gastos[contaAgrupada]) {
+                            dadosMeses[mes].gastos[contaAgrupada] = 0;
+                        }
+                        dadosMeses[mes].gastos[contaAgrupada] += mov.movimento;
+                        dadosMeses[mes].total.gastos += mov.movimento;
+                    }
+                }
+            });
+            
+            return { meses, dadosMeses };
+        }
+
+        function exportarMapaExcel() {
+            const { meses, dadosMeses } = gerarDadosMapaPorMes();
+            const empresa = document.getElementById('nomEmpresa').textContent;
+            const data = document.getElementById('dataUltimaAtualizacao').textContent;
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Aba 1: Rendimentos
+            const rendimentosData = [];
+            rendimentosData.push(['MAPA DE EXPLORAÇÃO - RENDIMENTOS']);
+            rendimentosData.push(['Empresa:', empresa]);
+            rendimentosData.push([data]);
+            rendimentosData.push([]);
+            
+            // Cabeçalho com meses
+            const cabeçalhoRendimentos = ['Conta', 'Descritivo'];
+            meses.forEach(mes => cabeçalhoRendimentos.push(mes));
+            cabeçalhoRendimentos.push('TOTAL');
+            rendimentosData.push(cabeçalhoRendimentos);
+            
+            // Coletar todas as contas de rendimentos
+            const contasRendimentos = new Set();
+            Object.values(dadosMeses).forEach(mes => {
+                Object.keys(mes.rendimentos).forEach(conta => contasRendimentos.add(conta));
+            });
+            
+            // Adicionar dados de rendimentos
+            const contasRendimentosOrdenadas = Array.from(contasRendimentos).sort();
+            contasRendimentosOrdenadas.forEach(conta => {
+                const linha = [conta, getDescritivoMapeado(conta)];
+                let totalConta = 0;
+                meses.forEach((_, idx) => {
+                    const valor = dadosMeses[idx].rendimentos[conta] || 0;
+                    linha.push(valor);
+                    totalConta += valor;
+                });
+                linha.push(totalConta);
+                rendimentosData.push(linha);
+            });
+            
+            // Linha de total de rendimentos
+            const linhaTotal = ['TOTAL RENDIMENTOS', ''];
+            let totalGeralRendimentos = 0;
+            meses.forEach((_, idx) => {
+                linhaTotal.push(dadosMeses[idx].total.rendimentos);
+                totalGeralRendimentos += dadosMeses[idx].total.rendimentos;
+            });
+            linhaTotal.push(totalGeralRendimentos);
+            rendimentosData.push(linhaTotal);
+            
+            const wsRendimentos = XLSX.utils.aoa_to_sheet(rendimentosData);
+            XLSX.utils.book_append_sheet(wb, wsRendimentos, 'Rendimentos');
+            
+            // Aba 2: Gastos
+            const gastosData = [];
+            gastosData.push(['MAPA DE EXPLORAÇÃO - GASTOS']);
+            gastosData.push(['Empresa:', empresa]);
+            gastosData.push([data]);
+            gastosData.push([]);
+            
+            const cabeçalhoGastos = ['Conta', 'Descritivo'];
+            meses.forEach(mes => cabeçalhoGastos.push(mes));
+            cabeçalhoGastos.push('TOTAL');
+            gastosData.push(cabeçalhoGastos);
+            
+            // Coletar todas as contas de gastos
+            const contasGastos = new Set();
+            Object.values(dadosMeses).forEach(mes => {
+                Object.keys(mes.gastos).forEach(conta => contasGastos.add(conta));
+            });
+            
+            // Adicionar dados de gastos
+            const contasGastosOrdenadas = Array.from(contasGastos).sort();
+            contasGastosOrdenadas.forEach(conta => {
+                const linha = [conta, getDescritivoMapeado(conta)];
+                let totalConta = 0;
+                meses.forEach((_, idx) => {
+                    const valor = dadosMeses[idx].gastos[conta] || 0;
+                    linha.push(valor);
+                    totalConta += valor;
+                });
+                linha.push(totalConta);
+                gastosData.push(linha);
+            });
+            
+            // Linha de total de gastos
+            const linhaTotalGastos = ['TOTAL GASTOS', ''];
+            let totalGeralGastos = 0;
+            meses.forEach((_, idx) => {
+                linhaTotalGastos.push(dadosMeses[idx].total.gastos);
+                totalGeralGastos += dadosMeses[idx].total.gastos;
+            });
+            linhaTotalGastos.push(totalGeralGastos);
+            gastosData.push(linhaTotalGastos);
+            
+            // Linha de resultado
+            const linhaResultado = ['RESULTADO', ''];
+            let totalGeralResultado = 0;
+            meses.forEach((_, idx) => {
+                const resultado = dadosMeses[idx].total.rendimentos - dadosMeses[idx].total.gastos;
+                linhaResultado.push(resultado);
+                totalGeralResultado += resultado;
+            });
+            linhaResultado.push(totalGeralResultado);
+            gastosData.push(['']);
+            gastosData.push(linhaResultado);
+            
+            const wsGastos = XLSX.utils.aoa_to_sheet(gastosData);
+            XLSX.utils.book_append_sheet(wb, wsGastos, 'Gastos');
+            
+            // Baixar arquivo
+            XLSX.writeFile(wb, `Mapa_Exploracao_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function exportarMapaPDF() {
+            const { meses, dadosMeses } = gerarDadosMapaPorMes();
+            const empresa = document.getElementById('nomEmpresa').textContent;
+            const data = document.getElementById('dataUltimaAtualizacao').textContent;
+            
+            // Coletar contas
+            const contasRendimentos = new Set();
+            const contasGastos = new Set();
+            Object.values(dadosMeses).forEach(mes => {
+                Object.keys(mes.rendimentos).forEach(conta => contasRendimentos.add(conta));
+                Object.keys(mes.gastos).forEach(conta => contasGastos.add(conta));
+            });
+            
+            const contasRendimentosOrdenadas = Array.from(contasRendimentos).sort();
+            const contasGastosOrdenadas = Array.from(contasGastos).sort();
+            
+            // HTML Rendimentos
+            let htmlRendimentos = '<h3 style="color: #0EA5A0; margin-top: 0;">Rendimentos por Mês</h3>';
+            htmlRendimentos += '<table style="width: 100%; border-collapse: collapse; font-size: 10px;">';
+            htmlRendimentos += '<thead><tr style="background-color: #0EA5A0; color: white;">';
+            htmlRendimentos += '<th style="border: 1px solid #ddd; padding: 6px;">Conta</th>';
+            htmlRendimentos += '<th style="border: 1px solid #ddd; padding: 6px;">Descritivo</th>';
+            meses.forEach(mes => {
+                htmlRendimentos += `<th style="border: 1px solid #ddd; padding: 6px; text-align: right;">${mes}</th>`;
+            });
+            htmlRendimentos += '<th style="border: 1px solid #ddd; padding: 6px; text-align: right;">TOTAL</th>';
+            htmlRendimentos += '</tr></thead><tbody style="color: #000000;">';
+            
+            contasRendimentosOrdenadas.forEach(conta => {
+                htmlRendimentos += `<tr><td style="border: 1px solid #ddd; padding: 6px;">${conta}</td>`;
+                htmlRendimentos += `<td style="border: 1px solid #ddd; padding: 6px;">${getDescritivoMapeado(conta)}</td>`;
+                let totalConta = 0;
+                meses.forEach((_, idx) => {
+                    const valor = dadosMeses[idx].rendimentos[conta] || 0;
+                    totalConta += valor;
+                    const valorFormatado = valor.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    htmlRendimentos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${valorFormatado}</td>`;
+                });
+                const totalFormatado = totalConta.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                htmlRendimentos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right; font-weight: bold;">${totalFormatado}</td></tr>`;
+            });
+            
+            // Total Rendimentos
+            htmlRendimentos += '<tr style="background-color: #e0f2f1; font-weight: bold;">';
+            htmlRendimentos += '<td colspan="2" style="border: 1px solid #ddd; padding: 6px;">TOTAL RENDIMENTOS</td>';
+            let totalGeralRendimentos = 0;
+            meses.forEach((_, idx) => {
+                const valor = dadosMeses[idx].total.rendimentos;
+                totalGeralRendimentos += valor;
+                const valorFormatado = valor.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                htmlRendimentos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${valorFormatado}</td>`;
+            });
+            const totalGeralFormatado = totalGeralRendimentos.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            htmlRendimentos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${totalGeralFormatado}</td></tr>`;
+            htmlRendimentos += '</tbody></table>';
+            
+            // HTML Gastos
+            let htmlGastos = '<h3 style="color: #0EA5A0; margin-top: 30px;">Gastos por Mês</h3>';
+            htmlGastos += '<table style="width: 100%; border-collapse: collapse; font-size: 10px;">';
+            htmlGastos += '<thead><tr style="background-color: #0EA5A0; color: white;">';
+            htmlGastos += '<th style="border: 1px solid #ddd; padding: 6px;">Conta</th>';
+            htmlGastos += '<th style="border: 1px solid #ddd; padding: 6px;">Descritivo</th>';
+            meses.forEach(mes => {
+                htmlGastos += `<th style="border: 1px solid #ddd; padding: 6px; text-align: right;">${mes}</th>`;
+            });
+            htmlGastos += '<th style="border: 1px solid #ddd; padding: 6px; text-align: right;">TOTAL</th>';
+            htmlGastos += '</tr></thead><tbody style="color: #000000;">';
+            
+            contasGastosOrdenadas.forEach(conta => {
+                htmlGastos += `<tr><td style="border: 1px solid #ddd; padding: 6px;">${conta}</td>`;
+                htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px;">${getDescritivoMapeado(conta)}</td>`;
+                let totalConta = 0;
+                meses.forEach((_, idx) => {
+                    const valor = dadosMeses[idx].gastos[conta] || 0;
+                    totalConta += valor;
+                    const valorFormatado = valor.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${valorFormatado}</td>`;
+                });
+                const totalFormatado = totalConta.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right; font-weight: bold;">${totalFormatado}</td></tr>`;
+            });
+            
+            // Total Gastos
+            htmlGastos += '<tr style="background-color: #e0f2f1; font-weight: bold;">';
+            htmlGastos += '<td colspan="2" style="border: 1px solid #ddd; padding: 6px;">TOTAL GASTOS</td>';
+            let totalGeralGastos = 0;
+            meses.forEach((_, idx) => {
+                const valor = dadosMeses[idx].total.gastos;
+                totalGeralGastos += valor;
+                const valorFormatado = valor.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${valorFormatado}</td>`;
+            });
+            const totalGastosFormatado = totalGeralGastos.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${totalGastosFormatado}</td></tr>`;
+            
+            // Resultado
+            htmlGastos += '<tr style="background-color: #fef3c7; font-weight: bold;">';
+            htmlGastos += '<td colspan="2" style="border: 1px solid #ddd; padding: 6px;">RESULTADO</td>';
+            let totalGeralResultado = 0;
+            meses.forEach((_, idx) => {
+                const resultado = dadosMeses[idx].total.rendimentos - dadosMeses[idx].total.gastos;
+                totalGeralResultado += resultado;
+                const valorFormatado = resultado.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${valorFormatado}</td>`;
+            });
+            const totalResultadoFormatado = totalGeralResultado.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            htmlGastos += `<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">${totalResultadoFormatado}</td></tr>`;
+            htmlGastos += '</tbody></table>';
+            
+            // Criar HTML para PDF
+            const htmlContent = `
+                <style>
+                    * { color: #000000; }
+                    body { font-family: Arial, sans-serif; color: #000000; }
+                    h2 { color: #0EA5A0; border-bottom: 2px solid #0EA5A0; padding-bottom: 10px; }
+                    h3 { color: #0EA5A0; margin: 20px 0 15px 0; }
+                    p { color: #000000; margin: 5px 0; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th { background-color: #0EA5A0; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 10px; }
+                    td { padding: 8px; border: 1px solid #ddd; color: #000000; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    .header { margin-bottom: 20px; }
+                    .header p { margin: 5px 0; color: #000000; }
+                </style>
+                <h2>Mapa de Exploração - ACContas</h2>
+                <div class="header">
+                    <p><strong>Empresa:</strong> ${empresa}</p>
+                    <p><strong>${data}</strong></p>
+                </div>
+                ${htmlRendimentos}
+                ${htmlGastos}
+            `;
+            
+            // Configurações do PDF
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Mapa_Exploracao_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+            
+            // Gerar PDF
+            html2pdf().set(opt).from(htmlContent).save();
+        }
+    </script>
 </body>
 </html>

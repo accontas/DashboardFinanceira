@@ -10,22 +10,13 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --dark-bg: #0F1419; --dark-card: #1A2332; --dark-border: #2A3F52;
-            --text-light: #E8F0F3; --accent-teal: #0EA5A0; --success: #10b981; --error: #ef4444;
-        }
-        body {
-            font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2f40 100%);
-            color: var(--text-light); min-height: 100vh; padding: 20px;
-        }
+        :root { --dark-bg: #0F1419; --dark-card: #1A2332; --dark-border: #2A3F52; --text-light: #E8F0F3; --accent-teal: #0EA5A0; --success: #10b981; --error: #ef4444; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2f40 100%); color: var(--text-light); min-height: 100vh; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid var(--dark-border); }
         .header h1 { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
         .header p { color: var(--accent-teal); }
-        .card {
-            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%);
-            border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 24px;
-        }
+        .card { background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 35, 50, 0.8) 100%); border: 1px solid var(--dark-border); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
         .card h2 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: var(--accent-teal); }
         .status { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: 500; }
         .status.success { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: var(--success); }
@@ -56,23 +47,16 @@
         <div id="statusDiv" class="status"></div>
 
         <div class="card">
-            <h2>🔧 Configuração Google Drive</h2>
-            <div id="configStatus" class="status error">
-                ⏳ Verificando configuração...
-            </div>
-        </div>
-
-        <div class="card">
             <h2>📋 Formato Esperado do XLSX</h2>
             <div class="info-box">
                 <strong>Estrutura esperada:</strong><br>
                 • Linhas 1-7: Ignoradas<br>
                 • Linha 8: Cabeçalhos das colunas<br>
                 • Linha 9+: Dados dos movimentos<br>
-                • Coluna A: Nº Conta SNC<br>
+                • Coluna A: Nº Conta SNC ou Conta longa (mapeada automaticamente)<br>
                 • Coluna B: Descritivo Conta<br>
                 • Coluna C: Data (AAAA-MM-DD)<br>
-                • Coluna M: <strong>Movimento (Saldo)</strong> ← IMPORTANTE!<br>
+                • Coluna M: <strong>Movimento (Saldo)</strong><br>
                 • Coluna P: Nome Terceiro<br>
                 • Coluna Q: NIF Terceiro
             </div>
@@ -107,14 +91,6 @@
             </div>
         </div>
 
-        <div class="card">
-            <h2>☁️ Sincronizar com Google Drive</h2>
-            <button class="button" id="syncBtn" onclick="syncData()">
-                ☁️ Sincronizar
-            </button>
-            <div id="syncStatus"></div>
-        </div>
-
         <div class="footer">
             <p>Admin Dashboard - Parser SNC</p>
             <p style="margin-top: 10px; color: #5a6d7a;">Valores com 2 casas decimais | Coluna M = Movimento (Saldo)</p>
@@ -125,44 +101,6 @@
 
     <script>
         let uploadedData = null;
-
-        window.addEventListener('load', function() {
-            checkConfiguration();
-        });
-
-        function checkConfiguration() {
-            const config = localStorage.getItem('googleDriveConfig');
-            
-            if (!config) {
-                document.getElementById('configStatus').innerHTML = `
-                    <div class="status error">
-                        ❌ Configuração NÃO encontrada<br><br>
-                        <strong>Para funcionar:</strong><br>
-                        1. Abra <strong>setup.html</strong><br>
-                        2. Preencha Google Drive ID<br>
-                        3. Clique "Guardar"<br>
-                        4. Volte aqui e recarregue (F5)
-                    </div>
-                `;
-                return;
-            }
-
-            try {
-                const configObj = JSON.parse(config);
-                document.getElementById('configStatus').innerHTML = `
-                    <div class="status success">
-                        ✅ Configuração Google Drive encontrada!<br>
-                        <strong>ID Pasta:</strong> ${configObj.folderId.substring(0, 30)}...
-                    </div>
-                `;
-            } catch (e) {
-                document.getElementById('configStatus').innerHTML = `
-                    <div class="status error">
-                        ❌ Erro ao ler configuração
-                    </div>
-                `;
-            }
-        }
 
         function handleDragOver(e) {
             e.preventDefault();
@@ -234,12 +172,12 @@
                     return conta && /^[67]\d{2,}$/.test(conta);
                 });
 
-                validRows.forEach((row, idx) => {
+                validRows.forEach((row) => {
                     const movimento = {
                         conta: row.A ? row.A.trim() : '',
                         descritivo: row.B ? row.B.trim() : '',
                         data: row.C ? row.C.toString().trim() : '',
-                        movimento: parseFloat(row.M) || 0,  // COLUNA M = MOVIMENTO
+                        movimento: parseFloat(row.M) || 0,
                         terceiro: row.P ? row.P.trim() : '',
                         nif: row.Q ? row.Q.trim() : ''
                     };
@@ -249,9 +187,7 @@
                         try {
                             const dateObj = new Date(movimento.data);
                             movimento.data = dateObj.toISOString().split('T')[0];
-                        } catch (e) {
-                            // Ignorar se não conseguir converter
-                        }
+                        } catch (e) {}
                     }
 
                     uploadedData.movimentos.push(movimento);
@@ -346,32 +282,6 @@
             }
         }
 
-        function syncData() {
-            const config = localStorage.getItem('googleDriveConfig');
-            if (!config) {
-                showStatus('❌ Configure Google Drive primeiro', 'error');
-                return;
-            }
-
-            const data = localStorage.getItem('dashboardData');
-            if (!data) {
-                showStatus('❌ Carregue e guarde dados primeiro', 'error');
-                return;
-            }
-
-            showStatus('⏳ Sincronizando...', 'info');
-
-            setTimeout(() => {
-                document.getElementById('syncStatus').innerHTML = `
-                    <div class="status success">
-                        ✅ Dados sincronizados com Google Drive!<br>
-                        ${uploadedData.movimentos.length} movimentos processados
-                    </div>
-                `;
-                showStatus('✅ Sincronização concluída!', 'success');
-            }, 1000);
-        }
-
         function clearData() {
             if (confirm('⚠️ Tem a certeza que deseja limpar todos os dados?')) {
                 localStorage.removeItem('dashboardData');
@@ -387,8 +297,6 @@
             statusDiv.className = `status ${type}`;
             statusDiv.textContent = message;
         }
-
-        setInterval(checkConfiguration, 5000);
     </script>
 </body>
 </html>
